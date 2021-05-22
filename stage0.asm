@@ -3,13 +3,11 @@
 
 jmp short entry
 
-greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa ; 0xd is \r and 0xa is \n
-greetings_end: ; just a label for the address of the string end
+greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 greetings_len: equ $-greetings
 
 entry:
 	mov si, greetings
-	mov di, greetings_end
 	call print
 
 key_input:
@@ -28,8 +26,8 @@ print:
 		mov al, [si]
 		int 0x10
 		inc si
-	cmp si, di;greetings_end
-	jne print_next_char
+		cmp byte [si], 0x0
+		jnz print_next_char
 	ret
 
 ; MBR boot signature
