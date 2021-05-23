@@ -7,7 +7,7 @@ boot.img: stage0.asm
 	nasm -f bin -o boot.img stage0.asm
 
 boot: boot.img
-	qemu-system-i386 -drive format=raw,file=boot.img
+	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset
 
 clean:
 	rm -f *.o *.bin *.img *.iso

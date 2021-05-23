@@ -5,6 +5,11 @@ entry:
 	mov si, greetings
 	call print
 
+	; text mode 80x25 EGA, VGA
+	mov ah, 0x0
+	mov al, 0x3
+	int 0x10
+
 	; video mode: 320x200 @ 16 colors
 	;mov ah, 0x0
 	;mov al, 0x13
@@ -24,8 +29,11 @@ entry:
 	xor ax, ax
 	mov ds, ax
 
-	; load gdt
+	; load GDT
 	lgdt [gdt_desc]
+	
+	; load IDT
+	lidt [idt_desc]
 
 	; enable protected mode
 	mov eax, cr0
@@ -42,15 +50,15 @@ pm_entry:
 	; setup all data selectors
 	mov ax, (gdt_data_segment - gdt_start)
 	mov ds, ax
-	mov ss, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
+	mov ss, ax
 
 	; set stack offset with esp
 	mov esp, 0x90000
 
-	; print P character
+	; print P character with VGA text mode buffer
 	mov eax, 0xb8000
 	mov byte [eax], 'P'
 	mov byte [eax + 1], 0x1b ; cyan with blue background
@@ -99,6 +107,11 @@ gdt_end:
 gdt_desc:
 	dw gdt_end - gdt_start - 1 ; GDT size - 1
 	dd gdt_start ; gdt base
+
+; empty IDT
+idt_desc:
+	dw 0
+	dd 0
 
 
 ; MBR boot signature
