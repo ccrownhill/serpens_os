@@ -97,8 +97,8 @@ gdt_end:
 
 ; gdt descriptor
 gdt_desc:
-	dw gdt_end - gdt_start
-	dd gdt_start
+	dw gdt_end - gdt_start - 1 ; GDT size - 1
+	dd gdt_start ; gdt base
 
 
 ; MBR boot signature
