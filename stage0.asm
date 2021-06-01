@@ -12,7 +12,7 @@ entry:
 
 	; video mode: 320x200 @ 16 colors
 	;mov ah, 0x0
-	;mov al, 0x13
+	;mov al, 0xd
 	;int 0x10
 
 	; disable interrupts
@@ -48,20 +48,23 @@ entry:
 
 pm_entry:
 	; setup all data selectors
-	mov ax, (gdt_data_segment - gdt_start)
+	mov ax, (gdt_data_segment - gdt_start) ; 0x10
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
 
-	; set stack offset with esp
-	mov esp, 0x90000
+	; init stack by setting stack pointer to some empty memory region
+	; kernel will be loaded here
+	mov esp, 0x10000 ; 0x10000 because there is a lot of free memory until
+	                 ; 0x7c00 where the bootloader is loaded
 
-	; print P character with VGA text mode buffer
-	mov eax, 0xb8000
-	mov byte [eax], 'P'
-	mov byte [eax + 1], 0x1b ; cyan with blue background
+	; print P character with VGA text mode buffer on 3rd line
+	mov byte [0xb8140], 'H'
+	mov byte [0xb8141], 0xf ; white on black
+	mov byte [0xb8142], 'i'
+	mov byte [0xb8143], 0xf
 
 _hang:
 	jmp _hang
@@ -80,7 +83,6 @@ print:
 	ret
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
-greetings_len: equ $-greetings
 
 ; GDT
 align 8
@@ -98,8 +100,8 @@ gdt_data_segment:
 	dw 0xffff
 	dw 0
 	db 0
-	dw 0b10010010
-	dw 0b11001111
+	db 0b10010010
+	db 0b11001111
 	db 0
 gdt_end:
 
@@ -112,7 +114,6 @@ gdt_desc:
 idt_desc:
 	dw 0
 	dd 0
-
 
 ; MBR boot signature
 times 510-($-$$) db 0
