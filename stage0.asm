@@ -57,8 +57,7 @@ pm_entry:
 
 	; init stack by setting stack pointer to some empty memory region
 	; kernel will be loaded here
-	mov esp, 0x10000 ; 0x10000 because there is a lot of free memory until
-	                 ; 0x7c00 where the bootloader is loaded
+	mov esp, 0x10000 ; 0x10000 because there is a lot of free memory
 
 	; print P character with VGA text mode buffer on 3rd line
 	mov byte [0xb8140], 'H'
