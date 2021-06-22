@@ -89,14 +89,33 @@ print:
 	ret
 
 print_hex:
-	; print hexadecimal value stored in dx
-	; NOT DONE
-	mov dx, bx
-	and bx, 0x9
-	add bx, 48
-	mov si, bx
-	call print
-	ret
+		; print hexadecimal value stored in dx
+		; NOT DONE
+		mov ah, 0xe
+		mov al, '0'
+		int 0x10
+		mov al, 'x'
+		int 0x10
+		xor bx, bx
+	draw_nibble:
+		mov bx, dx
+		cmp bx, 0
+		je done
+		and bx, 0xf
+		cmp bx, 0x9
+		jg greater_than_9
+	less_than_9:
+		add bx, 48 ; because '0' is 48 in code page 437 encoding
+		jmp print_num
+	greater_than_9:
+		add bx, 55 ; 55 because that way 0xa will become 'A' in Code page 437
+	print_num:
+		mov al, bl
+		int 0x10
+		shr dx, 4
+		jmp draw_nibble
+	done:
+		ret
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 
