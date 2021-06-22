@@ -1,6 +1,10 @@
 [org 0x7c00]
 [bits 16]
 
+; TODO: FINISH PRINT_HEX FN
+; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
+; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
+
 entry:
 	mov si, greetings
 	call print
@@ -14,6 +18,9 @@ entry:
 	;mov ah, 0x0
 	;mov al, 0xd
 	;int 0x10
+
+	mov dx, 0x1fb6
+	call print_hex
 
 	; disable interrupts
 	cli
@@ -79,6 +86,16 @@ print:
 		inc si
 		cmp byte [si], 0x0
 		jnz print_next_char
+	ret
+
+print_hex:
+	; print hexadecimal value stored in dx
+	; NOT DONE
+	mov dx, bx
+	and bx, 0x9
+	add bx, 48
+	mov si, bx
+	call print
 	ret
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
