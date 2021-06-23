@@ -1,11 +1,20 @@
 [org 0x7c00]
 [bits 16]
 
-; TODO: FINISH PRINT_HEX FN
+; TODO: MAKE PRINT_HEX PRINT IN CORRECT ORDER BY ALLOCATING MEMORY ON THE STACK
+				AND WRITING THE CHARACTERS THERE
+				THEN A POINTER TO THIS MEMORY WILL BE PUT INTO SI SO THAT THE STRING
+				CAN BE PRINTED WITH THE PRINT FUNCTION
 ; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
 ; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
 
 entry:
+	; init stack by setting stack pointer to some empty memory region
+	; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
+	mov sp, 0x3000
+
+	mov bp, sp ; init base pointer
+
 	mov si, greetings
 	call print
 
@@ -62,9 +71,7 @@ pm_entry:
 	mov gs, ax
 	mov ss, ax
 
-	; init stack by setting stack pointer to some empty memory region
-	; kernel will be loaded here
-	mov esp, 0x10000 ; 0x10000 because there is a lot of free memory
+	mov esp, 0x3000
 
 	; print P character with VGA text mode buffer on 3rd line
 	mov byte [0xb8140], 'H'
@@ -91,6 +98,11 @@ print:
 print_hex:
 		; print hexadecimal value stored in dx
 		; NOT DONE
+		push bp
+		mov bp, sp
+		sub sp, byte 0x10 ; allocate 16 bytes on stack
+		xor cx, cx ; set counter to 0
+		
 		mov ah, 0xe
 		mov al, '0'
 		int 0x10
@@ -110,11 +122,15 @@ print_hex:
 	greater_than_9:
 		add bx, 55 ; 55 because that way 0xa will become 'A' in Code page 437
 	print_num:
+		mov byte [bp - 0x1], bl ; TODO:	CORRECT THIS
 		mov al, bl
 		int 0x10
 		shr dx, 4
+		inc cx
 		jmp draw_nibble
 	done:
+		mov sp, bp
+		pop bp
 		ret
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
