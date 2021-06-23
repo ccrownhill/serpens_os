@@ -5,14 +5,18 @@
 ; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
 
 entry:
+
+	; disable interrupts
+	cli
+	; clear direction flag
+	;cld
+
 	; init stack by setting stack pointer to some empty memory region
 	; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
 	mov sp, 0x3000
-
+	; next you could also init all segment registers
+	; this is not necessary since they have the desired 0x0 value already
 	mov bp, sp ; init base pointer
-
-	mov si, greetings
-	call print
 
 	; text mode 80x25 EGA, VGA
 	mov ah, 0x0
@@ -24,14 +28,20 @@ entry:
 	;mov al, 0xd
 	;int 0x10
 
-	mov dx, 0xabcd
-	call print_hex
+read_disk:
+	; load next 0x0 sectors with the kernel into memory at 0x1000
+	mov ah, 0x2 ; read disk sectors into memory
+	mov al, 0x40 ; read 0x40 sectors
+	mov ch, 0x0 ; cylinder 0x0
+	mov dh, 0x0 ; head 0x0
+	mov cl, 0x2 ; sector 2 (the one after the bootsector)
+	mov dl, 0x0 ; boot drive
+	mov bx, 0x1000 ; load the next sectors at memory address es:0x1000 (es is 0x0)
+	int 0x13
 
-	; disable interrupts
-	cli
-	; clear direction flag
-	;cld
+	jc disk_error ; carry flag is set on error
 
+switch_to_pm:
 	; Set the A20 line
 	in al, 0x92
 	or al, 2
@@ -126,9 +136,15 @@ print_hex:
 		mov sp, bp
 		pop bp
 		ret
+	
+disk_error:
+	mov si, DISK_ERR_MSG
+	call print
+	jmp $
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 hexdigits: db "0123456789ABCDEF" ; used for printing hex values
+DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 
 ; GDT
 align 8
