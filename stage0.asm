@@ -1,10 +1,6 @@
 [org 0x7c00]
 [bits 16]
 
-; TODO: MAKE PRINT_HEX PRINT IN CORRECT ORDER BY ALLOCATING MEMORY ON THE STACK
-				AND WRITING THE CHARACTERS THERE
-				THEN A POINTER TO THIS MEMORY WILL BE PUT INTO SI SO THAT THE STRING
-				CAN BE PRINTED WITH THE PRINT FUNCTION
 ; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
 ; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
 
@@ -28,7 +24,7 @@ entry:
 	;mov al, 0xd
 	;int 0x10
 
-	mov dx, 0x1fb6
+	mov dx, 0xabcd
 	call print_hex
 
 	; disable interrupts
@@ -88,52 +84,51 @@ print:
 	; and end address stored in di
 	mov ah, 0xe
 	print_next_char:
-		mov al, [si]
+		mov byte al, [si]
 		int 0x10
 		inc si
+		
+		; check if '\0' character at the end is reached
 		cmp byte [si], 0x0
 		jnz print_next_char
 	ret
 
 print_hex:
 		; print hexadecimal value stored in dx
-		; NOT DONE
+		; this might be needed for debugging
+
+		; setup new stackframe
 		push bp
 		mov bp, sp
-		sub sp, byte 0x10 ; allocate 16 bytes on stack
-		xor cx, cx ; set counter to 0
 		
-		mov ah, 0xe
-		mov al, '0'
-		int 0x10
-		mov al, 'x'
-		int 0x10
+		push byte 0x0
+		
 		xor bx, bx
 	draw_nibble:
 		mov bx, dx
-		cmp bx, 0
-		je done
-		and bx, 0xf
-		cmp bx, 0x9
-		jg greater_than_9
-	less_than_9:
-		add bx, 48 ; because '0' is 48 in code page 437 encoding
-		jmp print_num
-	greater_than_9:
-		add bx, 55 ; 55 because that way 0xa will become 'A' in Code page 437
-	print_num:
-		mov byte [bp - 0x1], bl ; TODO:	CORRECT THIS
-		mov al, bl
-		int 0x10
-		shr dx, 4
-		inc cx
-		jmp draw_nibble
-	done:
+		and bx, 0xf ; only consider last 4 bits
+		mov bx, [hexdigits + bx] ; get the character corresponding to the number
+		
+		; push current digit character on stack
+		dec sp
+		mov byte [esp], bl
+
+		shr dx, 4 ; >> 4
+		cmp dx, 0
+		jne draw_nibble
+
+		; print the digit with "0x" prepended
+		push word "0x"
+		mov si, sp
+		call print
+
+		; clean up
 		mov sp, bp
 		pop bp
 		ret
 
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
+hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 
 ; GDT
 align 8
