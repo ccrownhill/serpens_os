@@ -79,14 +79,15 @@ pm_entry:
 
 	mov esp, 0x3000
 
-	; print P character with VGA text mode buffer on 3rd line
-	mov byte [0xb8140], 'H'
-	mov byte [0xb8141], 0xf ; white on black
-	mov byte [0xb8142], 'i'
-	mov byte [0xb8143], 0xf
+	; continue execution in kernel
+	call 0x1000
+	jmp $
 
-_hang:
-	jmp _hang
+	; print P character with VGA text mode buffer on 3rd line
+	;mov byte [0xb8140], 'H'
+	;mov byte [0xb8141], 0xf ; white on black
+	;mov byte [0xb8142], 'i'
+	;mov byte [0xb8143], 0xf
 
 [bits 16]
 print:

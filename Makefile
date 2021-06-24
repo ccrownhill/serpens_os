@@ -17,6 +17,7 @@ boot.img: bootsect.bin main.bin
 	dd if=bootsect.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
 	dd if=main.bin of=boot.img conv=notrunc bs=512 seek=1 count=2048
 	# maybe just use: cat bootsect.bin main.bin > boot.img
+	#cat bootsect.bin main.bin > boot.img
 
 boot: boot.img
 	qemu-system-i386 -drive format=raw,file=boot.img -d cpu_reset
