@@ -1,15 +1,11 @@
 [org 0x7c00]
 [bits 16]
 
+; TODO: FIX PROBLEM THAT THIS BINARY IS GREATER THAN 512 BYTES
 ; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
 ; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
 
 entry:
-
-	; disable interrupts
-	cli
-	; clear direction flag
-	;cld
 
 	; init stack by setting stack pointer to some empty memory region
 	; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
@@ -29,19 +25,37 @@ entry:
 	;int 0x10
 
 read_disk:
+	; CHS read (not used here):
 	; load next 0x0 sectors with the kernel into memory at 0x1000
-	mov ah, 0x2 ; read disk sectors into memory
-	mov al, 0x40 ; read 0x40 sectors
-	mov ch, 0x0 ; cylinder 0x0
-	mov dh, 0x0 ; head 0x0
-	mov cl, 0x2 ; sector 2 (the one after the bootsector)
-	mov dl, 0x0 ; boot drive
-	mov bx, 0x1000 ; load the next sectors at memory address es:0x1000 (es is 0x0)
+	; using CHS (cylinder head sector) read
+	;mov ah, 0x2 ; read disk sectors into memory
+	;mov al, 0x1 ; read 1 sector
+	;mov ch, 0x0 ; cylinder 0x0
+	;mov dh, 0x0 ; head 0x0
+	;mov cl, 0x2 ; sector 2 (the one after the bootsector)
+	;mov dl, 0x0 ; boot drive
+
+  ;; load the next sectors at memory address es:bx 0x1000:0x0000 --> kernel at 0x10000
+	;mov bx, 0x1000 ; es can't be set directly
+	;mov es, bx
+
+	;mov bx, 0x0
+	;int 0x13
+
+	; Extended read
+	mov ah, 0x42
+	mov dl, 0x0 ; drive number
+	mov si, disk_address_packet
 	int 0x13
 
 	jc disk_error ; carry flag is set on error
 
 switch_to_pm:
+	; disable interrupts
+	cli
+	; clear direction flag
+	;cld
+
 	; Set the A20 line
 	in al, 0x92
 	or al, 2
@@ -80,7 +94,7 @@ pm_entry:
 	mov esp, 0x3000
 
 	; continue execution in kernel
-	call 0x1000
+	jmp 0x10000 ; this address was set with es:bx when loading the kernel from disk
 	jmp $
 
 	; print P character with VGA text mode buffer on 3rd line
@@ -146,6 +160,18 @@ disk_error:
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
+
+; used for Extended Read from disk
+disk_address_packet:
+	db 0x10 ; size of DAP
+	db 0x0 ; unused
+num_sectors:
+	dw 0x40
+offset:
+	dw 0x0
+segment:
+	dw 0x1000
+
 
 ; GDT
 align 8

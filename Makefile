@@ -13,9 +13,9 @@ main.bin: main.o
 	ld -o main.bin -Ttext 0x1000 main.o --oformat binary
 
 boot.img: bootsect.bin main.bin
-	dd if=/dev/zero of=boot.img bs=512 count=2880
+	dd if=/dev/zero of=boot.img bs=512 count=41
 	dd if=bootsect.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
-	dd if=main.bin of=boot.img conv=notrunc bs=512 seek=1 count=2048
+	dd if=main.bin of=boot.img conv=notrunc bs=512 seek=1 count=40
 	# maybe just use: cat bootsect.bin main.bin > boot.img
 	#cat bootsect.bin main.bin > boot.img
 
