@@ -1,13 +1,6 @@
 [org 0x7c00]
 [bits 16]
 
-; TODO: FIX PROBLEM THAT THIS BINARY IS GREATER THAN 512 BYTES
-;				THE CODE ITSELF IS NOT TOO BIG
-;       THE PROBLEM IS THAT THE 0 PADDING IS NOT WORKGING PROPERLY
-;       EVERYTHING IS PADDED WITH 510 ZEROS
-; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
-; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
-
 entry:
 
 	; init stack by setting stack pointer to some empty memory region
@@ -28,27 +21,34 @@ entry:
 	;int 0x10
 
 read_disk:
-	; CHS read (not used here):
-	; load next 0x0 sectors with the kernel into memory at 0x1000
-	; using CHS (cylinder head sector) read
-	;mov ah, 0x2 ; read disk sectors into memory
-	;mov al, 0x1 ; read 1 sector
-	;mov ch, 0x0 ; cylinder 0x0
-	;mov dh, 0x0 ; head 0x0
-	;mov cl, 0x2 ; sector 2 (the one after the bootsector)
-	;mov dl, 0x0 ; boot drive
-
-  ;; load the next sectors at memory address es:bx 0x1000:0x0000 --> kernel at 0x10000
-	;mov bx, 0x1000 ; es can't be set directly
-	;mov es, bx
-
-	;mov bx, 0x0
+	; get info about disk
+	;mov ah, 0x8
+	;mov dl, 0x80
 	;int 0x13
+	;and cl, 0x3f ; make cl contain the maximum number of sectors per cylinder/track
+	;xor dx, dx
+	;mov dl, cl
+	;call print_hex
 
-	; Extended read
+	; Extended read with LBA addressing
 	mov ah, 0x42
-	mov dl, 0x80 ; drive number
+	mov dl, [drive_num] ; drive number
 	mov si, disk_address_packet
+	int 0x13
+	jnc switch_to_pm ; if the read succeeded
+
+	; otherwise fall back to CHS read
+	mov ah, 0x2 ; read disk sectors into memory
+	mov al, [num_sectors] ; read 0x20 sectors
+	mov ch, 0x0 ; cylinder 0x0
+	mov dh, 0x0 ; head 0x0
+	mov cl, [chs_sector]
+	mov dl, [drive_num]
+
+	; load the next sectors at memory address es:bx 0x1000:0x0000 --> kernel at 0x10000
+	mov bx, 0x1000 ; es can't be set directly
+	mov es, bx
+	xor bx, bx
 	int 0x13
 
 	jc disk_error ; carry flag is set on error
@@ -96,8 +96,13 @@ pm_entry:
 
 	mov esp, 0x3000
 
-	; continue execution in kernel
-	jmp 0x10000 ; this address was set with es:bx when loading the kernel from disk
+	; TODO: MAKE FAR JUMP WORK BY USING A LOADER.ASM THAT WILL SETUP THE
+	;        SEGMENT REGISTERS FOR THE MAIN.C KERNEL
+	;				OTHERWISE YOU WILL SEE THIS BLINKING
+	;				HOWEVER THE JUMP DOES WORK CORRECTLY
+	; continue execution in kernel with far jump
+	;jmp 0x1000:0x0 ; this address was set to 0x1000:0x0 when loading the kernel from disk
+	jmp 0x10000
 	jmp $
 
 	; print P character with VGA text mode buffer on 3rd line
@@ -161,24 +166,30 @@ disk_error:
 	call print
 	jmp $
 
-;greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
+greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
+
+; parameters for reading from disk
+drive_num: db 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
+; for CHS
+;chs_cylinder: db 0x0
+;chs_head: db 0x0
+chs_sector: db 0x2 ; sector 2 (the one after the bootsector)
 
 ; used for Extended Read from disk
 disk_address_packet:
 	db 0x10 ; size of DAP
 	db 0x0 ; unused
 num_sectors:
-	dw 0x40
+	dw 0x20
 offset:
 	dw 0x0
-segment:
+mem_segment:
 	dw 0x1000
 sector:
 	dd 0x1 ; start reading from second sector
 	dd 0x0 ; upper bits ; upper bits
-
 
 ; GDT
 align 8
