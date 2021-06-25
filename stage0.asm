@@ -2,6 +2,9 @@
 [bits 16]
 
 ; TODO: FIX PROBLEM THAT THIS BINARY IS GREATER THAN 512 BYTES
+;				THE CODE ITSELF IS NOT TOO BIG
+;       THE PROBLEM IS THAT THE 0 PADDING IS NOT WORKGING PROPERLY
+;       EVERYTHING IS PADDED WITH 510 ZEROS
 ; TODO: LOAD NEXT DISK SECTORS WITH KERNEL
 ; TODO: CONTINUE CODE EXECUTION AT THE KERNEL
 
@@ -44,7 +47,7 @@ read_disk:
 
 	; Extended read
 	mov ah, 0x42
-	mov dl, 0x0 ; drive number
+	mov dl, 0x80 ; drive number
 	mov si, disk_address_packet
 	int 0x13
 
@@ -118,6 +121,7 @@ print:
 		jnz print_next_char
 	ret
 
+; commented out because otherwise code would be too big
 print_hex:
 		; print hexadecimal value stored in dx
 		; this might be needed for debugging
@@ -157,7 +161,7 @@ disk_error:
 	call print
 	jmp $
 
-greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
+;greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 
@@ -171,6 +175,9 @@ offset:
 	dw 0x0
 segment:
 	dw 0x1000
+sector:
+	dd 0x1 ; start reading from second sector
+	dd 0x0 ; upper bits ; upper bits
 
 
 ; GDT
