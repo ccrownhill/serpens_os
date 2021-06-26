@@ -32,7 +32,7 @@ read_disk:
 
 	; Extended read with LBA addressing
 	mov ah, 0x42
-	mov dl, [drive_num] ; drive number
+	mov dl, drive_num ; drive number
 	mov si, disk_address_packet
 	int 0x13
 	jnc switch_to_pm ; if the read succeeded
@@ -42,8 +42,8 @@ read_disk:
 	mov al, [num_sectors] ; read 0x20 sectors
 	mov ch, 0x0 ; cylinder 0x0
 	mov dh, 0x0 ; head 0x0
-	mov cl, [chs_sector]
-	mov dl, [drive_num]
+	mov cl, chs_sector
+	mov dl, drive_num
 
 	; load the next sectors at memory address es:bx 0x1000:0x0000 --> kernel at 0x10000
 	mov bx, 0x1000 ; es can't be set directly
@@ -103,7 +103,6 @@ pm_entry:
 	; continue execution in kernel with far jump
 	;jmp 0x1000:0x0 ; this address was set to 0x1000:0x0 when loading the kernel from disk
 	jmp 0x10000
-	jmp $
 
 	; print P character with VGA text mode buffer on 3rd line
 	;mov byte [0xb8140], 'H'
@@ -171,11 +170,11 @@ hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 
 ; parameters for reading from disk
-drive_num: db 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
+drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
 ; for CHS
-;chs_cylinder: db 0x0
-;chs_head: db 0x0
-chs_sector: db 0x2 ; sector 2 (the one after the bootsector)
+;chs_cylinder equ 0x0
+;chs_head equ 0x0
+chs_sector equ 0x2 ; sector 2 (the one after the bootsector)
 
 ; used for Extended Read from disk
 disk_address_packet:

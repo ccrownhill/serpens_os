@@ -10,8 +10,8 @@ main.o: main.c
 	gcc -ffreestanding -c main.c -o main.o
 
 main.bin: main.o
-	# "-Ttext 0x1000" because that's where the kernel will be loaded in memory
-	ld -o main.bin -Ttext 0x1000 main.o --oformat binary
+	# "-Ttext 0x10000" because that's where the kernel will be loaded in memory
+	ld -o main.bin -Ttext 0x10000 main.o --oformat binary
 
 boot.img: bootsect.bin main.bin
 	#dd if=/dev/zero of=boot.img bs=512 count=70
