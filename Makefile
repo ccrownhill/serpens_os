@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -elf_i386 -m32 -ffreestanding
+CFLAGS = -elf_i386 -m32 -ffreestanding -fno-pie -nostdlib
 
 all: boot.img
 

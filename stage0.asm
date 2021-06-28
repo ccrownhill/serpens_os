@@ -2,7 +2,6 @@
 [bits 16]
 
 entry:
-
 	; init stack by setting stack pointer to some empty memory region
 	; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
 	mov sp, 0x3000
