@@ -1,7 +1,7 @@
 [bits 32]
 [extern main]
 
-section .bss
+section .data
 align 16
 stack_bottom:
 resb 0x4000 ; 16 KiB
