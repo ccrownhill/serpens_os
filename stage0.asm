@@ -100,8 +100,8 @@ pm_entry:
 	;				OTHERWISE YOU WILL SEE THIS BLINKING
 	;				HOWEVER THE JUMP DOES WORK CORRECTLY
 	; continue execution in kernel with far jump
-	;jmp 0x1000:0x0 ; this address was set to 0x1000:0x0 when loading the kernel from disk
-	jmp 0x10000
+	jmp 0x1000:0x0 ; this address was set to 0x1000:0x0 when loading the kernel from disk
+	;jmp 0x10000
 
 	; print P character with VGA text mode buffer on 3rd line
 	;mov byte [0xb8140], 'H'
