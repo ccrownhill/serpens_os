@@ -1,10 +1,16 @@
+char* VGA_MEMORY = (char*) (0xb8000);
+
 void main()
 {
-	char* VGA_MEMORY = (char*) (0xb8000);
-	// TODO: WHY DO I HAVE TO ADD 1 TO INDECES? HOW CAN I STOP DOING IT?
-	VGA_MEMORY[0] = 'H';
-	VGA_MEMORY[1] = 0xf;
-	VGA_MEMORY[2] = 'i';
-	VGA_MEMORY[3] = 0xf;
+	print("Hi", 2);
 	while(1);
+}
+
+void print(char *msg, int msg_len)
+{
+	int i;
+	for (i = 0; i < msg_len; i++) {
+		VGA_MEMORY[i*2] = msg[i];
+		VGA_MEMORY[i*2+1] = 0xf; // white color
+	}
 }
