@@ -95,13 +95,8 @@ pm_entry:
 
 	mov esp, 0x3000
 
-	; TODO: MAKE FAR JUMP WORK BY USING A LOADER.ASM THAT WILL SETUP THE
-	;        SEGMENT REGISTERS FOR THE MAIN.C KERNEL
-	;				OTHERWISE YOU WILL SEE THIS BLINKING
-	;				HOWEVER THE JUMP DOES WORK CORRECTLY
-	; continue execution in kernel with far jump
-	jmp 0x1000:0x0 ; this address was set to 0x1000:0x0 when loading the kernel from disk
-	;jmp 0x10000
+	; continue execution in kernel with jump
+	jmp 0x10000 ; this address was set to 0x1000:0x0 when loading the kernel from disk
 
 	; print P character with VGA text mode buffer on 3rd line
 	;mov byte [0xb8140], 'H'
@@ -124,7 +119,6 @@ print:
 		jnz print_next_char
 	ret
 
-; commented out because otherwise code would be too big
 print_hex:
 		; print hexadecimal value stored in dx
 		; this might be needed for debugging
@@ -187,7 +181,7 @@ mem_segment:
 	dw 0x1000
 sector:
 	dd 0x1 ; start reading from second sector
-	dd 0x0 ; upper bits ; upper bits
+	dd 0x0 ; upper bits
 
 ; GDT
 align 8
