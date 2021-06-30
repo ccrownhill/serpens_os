@@ -1,16 +1,25 @@
 [bits 32]
 [extern main]
 
-section .data
+section .bss
 align 16
 stack_bottom:
 resb 0x4000 ; 16 KiB
 stack_top:
 
+section .text
 global _start
 _start:
 	cli ; disable interrupts
 	cld ; clear direction flag
+
+	; init segment registers
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
 
 	mov esp, stack_top ; init stack
 
