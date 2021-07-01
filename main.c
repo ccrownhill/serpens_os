@@ -1,6 +1,8 @@
 /* Kernel of TicTacToe OS */
 
 #define FIELD_TITLE_CENTER_ADDRESS 0xb84ac
+#define PLAYER_X_MARK 'X'
+#define OPPONENT_O_MARK 'O'
 
 char* VGA_MEMORY = (char*) (0xb8000);
 
@@ -16,7 +18,7 @@ char* FIELD_ADDRESSES[9] = {(char*) (0xb8686), (char*) (0xb868c), (char*) (0xb86
  */
 void field_title(char *text, int text_len)
 {
-	char* start = (char*)FIELD_TITLE_CENTER_ADDRESS - (text_len / 2);
+	char* start = (char*)FIELD_TITLE_CENTER_ADDRESS - (text_len / 2)*2;
 	int i;
 	for (i = 0; i < text_len; i++) {
 		start[i*2] = text[i];
@@ -33,9 +35,20 @@ void init_field()
 	}
 }
 
+/* Insert the mark mark ('X' or 'O') on the position field_pos
+ * which is a number between 0 and 8
+ */
+void insert_mark(char mark, short field_pos)
+{
+	FIELD_ADDRESSES[field_pos][0] = mark;
+	FIELD_ADDRESSES[field_pos][1] = 0xf; /* white */
+}
+
 void main()
 {
-	field_title("Hello!", 6);
+	enum marks mark = O;
+	field_title("Tic-Tac-Toe Time!", 17);
 	init_field();
+	insert_mark(PLAYER_X_MARK, 4);
 	while(1);
 }
