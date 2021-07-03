@@ -6,4 +6,7 @@
 #define PLAYER_X_MARK 'X'
 #define OPPONENT_O_MARK 'O'
 
+void init_field();
+void insert_mark(char mark, short field_pos);
+
 #endif
