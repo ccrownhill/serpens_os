@@ -1,6 +1,6 @@
 /* Display driver */
 
-#include "display.h"
+#include <display.h>
 
 char* VGA_MEMORY = (char*) (0xb8000);
 

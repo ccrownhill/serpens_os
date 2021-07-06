@@ -1,4 +1,4 @@
-#include "display.h"
+#include <display.h>
 
 int FIELD_ROWS[3] = {10, 12, 14};
 int FIELD_COLS[3] = {35, 38, 41};

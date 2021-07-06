@@ -1,8 +1,8 @@
 /* Kernel of TicTacToe OS */
 
-#include "main.h"
-#include "display.h"
-#include "field.h"
+#include <main.h>
+#include <display.h>
+#include <field.h>
 
 void start_screen()
 {
