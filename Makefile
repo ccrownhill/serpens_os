@@ -31,6 +31,6 @@ boot: boot.img
 
 clean:
 	rm -f *.o *.bin *.img *.iso
-	rm -f kernel/*.o drivers/*.o boot/*.bin boot/*.o
+	rm -f src/*.o src/*.bin
 
 .PHONY: all boot clean

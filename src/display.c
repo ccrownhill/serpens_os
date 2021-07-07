@@ -15,7 +15,7 @@ void print_left(char* msg, int col, int row)
 {
 	char* c;
 	for (c = msg; *c != '\0'; c++) {
-		print_char(*c, col, row, 0xf); /* print in white */
+		print_char(*c, col, row, 0xf); // print in white
 		col++;
 		if (col >= 80) {
 			col = 0;
@@ -24,7 +24,8 @@ void print_left(char* msg, int col, int row)
 	}
 }
 
-/* Be careful with this function
+/**
+ * Be careful with this function
  * it only works if the text fits centered onto the specified location
  * into 1 row
  */
