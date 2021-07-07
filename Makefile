@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -elf_i386 -m32 -Wall -Wextra -ffreestanding -fno-pie -nostdlib -nostdinc -fno-builtin -fno-stack-protector
-INCS = -Ikernel -Idrivers
+INCS = -Iinclude
 
-SRC = $(wildcard */*.c)
-HEADERS = $(wildcard */*.h)
+SRC = $(wildcard src/*.c)
+HEADERS = $(wildcard include/*.h)
 OBJ = $(SRC:.c=.o)
 
 all: boot.img
@@ -17,10 +17,10 @@ all: boot.img
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
-kernel.bin: boot/start.o $(OBJ)
+kernel.bin: src/start.o $(OBJ)
 	ld -m elf_i386 -o $@ -Tlink.ld $^ --oformat binary
 
-boot.img: boot/stage0.bin kernel.bin
+boot.img: src/stage0.bin kernel.bin
 	#dd if=/dev/zero of=boot.img bs=512 count=70
 	#dd if=bootsect.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
 	#dd if=main.bin of=boot.img conv=notrunc bs=512 seek=1 count=69
