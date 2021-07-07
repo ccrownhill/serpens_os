@@ -16,7 +16,7 @@ void send_command(u8 command)
 {
 	// wait until command input buffer is empty
 	// by checking if the second bit of the status register is set
-	while ((port_byte_in(0x64) & 0x2)) {}
+	while (port_byte_in(0x64) & 0x2) {}
 	port_byte_out(0x60, command);
 }
 
@@ -31,15 +31,21 @@ u8 get_scancode()
 }
 
 /**
- * Set scancode set to either 1, 2 (default) or 3 (given in set)
- * TODO: REMOVE THIS OR MAKE JUST A GET_SCANCODE_SET FUNCTION OUT OF IT
+ * Get scancode set which is either 1, 2 (default) or 3 (given in set)
+ * If translation from set 2 to 1 is enable in the KBC
+ * the sets 1, 2 and 3 will be returned as 0x43, 0x41 and 0x3f
  */
-u8 set_scancode_set(u8 set)
+u8 get_scancode_set()
 {
 	u8 result;
 	send_command(0xf0);
-	while (!(port_byte_in(0x60) & 0xfa)) {}
-	port_byte_out(0x60, set);
+
+	while (!(port_byte_in(0x60) & 0xfa)) {} // wait for ACK response
+
+	// 0x0 is the parameter which causes the command 0xf0
+	// to return the current scancode set
+	port_byte_out(0x60, 0x0);
+
 	while (!(port_byte_in(0x60) & 0xfa)) {}
 	result = port_byte_in(0x60);
 	return result;

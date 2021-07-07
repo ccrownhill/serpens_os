@@ -15,7 +15,7 @@ void start_screen()
 
 void main()
 {
-	u8 set = set_scancode_set(0x0); // Get the current scancode set (because of translation 0x41 stands for set 2 as described here: https://web.stanford.edu/~ouster/cgi-bin/cs140-spring14/pintos/specs/kbd/scancodes-11.html
+	u8 set = get_scancode_set();
 	init_keyboard();
 	start_screen();
 	u8 scancode = get_scancode();
