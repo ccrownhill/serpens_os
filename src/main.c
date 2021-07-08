@@ -15,17 +15,13 @@ void start_screen()
 
 void main()
 {
-	u8 set = get_scancode_set();
 	init_keyboard();
 	start_screen();
-	u8 scancode = get_scancode();
+	u8 retchar = getchar();
 	clear_screen();
 
-	char scancode_string[10];
-	int_to_ascii((int)scancode, scancode_string);
-	print_left(scancode_string, 0, 24); // print it in the lower left corner
-	int_to_ascii((int)set, scancode_string);
-	print_left(scancode_string, 10, 24);
+	print_char(retchar, 0, 24, 0xf); // print it in the lower left corner
+
 	print_centered("Tic-Tac-Toe Time!", 17, TITLE_COL, TITLE_ROW);
 	init_field();
 	insert_mark(PLAYER_X_MARK, 4);

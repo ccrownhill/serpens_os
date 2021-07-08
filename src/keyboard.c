@@ -1,6 +1,25 @@
 #include <keyboard.h>
 #include <ports_io.h>
 
+// TODO: WRITE GET_KEY_DOWN AND GET_KEY_UP FUNCTIONS
+// TODO: USE CLEAR_OUTPUT_BUFFER IN ALL FUNCTIONS THAT NEED IT
+
+/**
+ * All ASCII characters for their corresponding scancodes
+ * Use the scancode as the index to get the right character
+ * Note: Non-ASCII characters like the F. keys get values greater than 0x7f
+ */
+u8 scancode_set1_chars[128] = {
+	KEY_NULL, KEY_ESC, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'-', '=', KEY_BACKSPACE, KEY_TAB, 'q', 'w', 'e', 'r', 't', 'y', 'u',
+	'i', 'o', 'p', '[', ']', KEY_ENTER, 0, 'a', 's', 'd', 'f', 'g', 'h', 'j',
+	'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm',
+	',', '.', '/', 0, 0, 0, ' ', 0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5,
+	KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, 0, 0, KEY_HOME, KEY_UP,
+	KEY_PAGE_UP, '-', KEY_LEFT, '5', KEY_RIGHT, '+', KEY_END, KEY_DOWN,
+	KEY_PAGE_DOWN, KEY_INSERT, KEY_DELETE, 0, 0, 0, KEY_F11, KEY_F12
+};
+
 void init_keyboard()
 {
 	// activate keyboard by enabling scanning
@@ -9,7 +28,7 @@ void init_keyboard()
 	// clear the keyboard output buffer as long as it is not empty
 	// (i.e. the first bit of the 0x64 status register is set)
 	while (port_byte_in(0x64) & 0x1)
-	port_byte_in(0x60);
+		port_byte_in(0x60);
 }
 
 void send_command(u8 command)
@@ -21,13 +40,50 @@ void send_command(u8 command)
 }
 
 /**
- * Waits until a key is pressed and returns the scancode
+ * Get scancode of last key press
  */
 u8 get_scancode()
 {
 	// wait until output buffer is full
 	while (!(port_byte_in(0x64) & 0x1)) {}
 	return port_byte_in(0x60);
+}
+
+/**
+ * Return ASCII character of last pressed key
+ */
+u8 getchar()
+{
+	u8 retchar;
+	u8 scancode = get_scancode();
+	retchar = scancode_set1_chars[scancode];
+	return retchar;
+}
+
+/**
+ * Wait for key press and
+ * return 1 if the pressed key matched the one specified by key_char
+ * or else 0
+ */
+u8 get_key_down(u8 key_char)
+{
+	// clear keyboard output buffer
+	// to make sure waiting for key starts now and no previous press is detected
+	while(port_byte_in(0x64) & 0x1)
+		port_byte_in(0x60);
+
+	return (getchar() == key_char)
+}
+
+u8 get_key_up(u8 key_char)
+{
+}
+
+// TODO: MAKE THIS AN INLINE FUNCTION IN .H OR SOME DEFINE FUNCTION
+void clean_output_buffer()
+{
+	while(port_byte_in(0x64) & 0x1)
+		port_byte_in(0x60);
 }
 
 /**
