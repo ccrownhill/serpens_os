@@ -6,13 +6,6 @@
 #include <keyboard.h>
 #include <util.h>
 
-void start_screen()
-{
-	clear_screen();
-	print_centered(START_SCREEN_TITLE, START_SCREEN_TITLE_LEN, 38, 11);
-	print_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15);
-}
-
 void main()
 {
 	init_keyboard();
@@ -20,9 +13,21 @@ void main()
 	get_key(UP_CHECK_AND_VAL); // wait for release of any key
 	clear_screen();
 
-	print_centered("Tic-Tac-Toe Time!", 17, TITLE_COL, TITLE_ROW);
+	print_centered("Your turn! You have the X marks!", 32, TITLE_COL, TITLE_ROW - 2, WHITE);
+	print_centered("Enter a number from 1-9 to put your mark in the desired field!", 62, TITLE_COL, TITLE_ROW, WHITE);
 	init_field();
-	insert_mark(PLAYER_X_MARK, 4);
 
 	while(1);
 }
+
+void player_turn()
+{
+}
+
+void start_screen()
+{
+	clear_screen();
+	print_centered(START_SCREEN_TITLE, START_SCREEN_TITLE_LEN, 38, 11, WHITE);
+	print_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
+}
+

@@ -9,6 +9,5 @@
 #define START_SCREEN_SUBTITLE_LEN 22
 
 void start_screen();
-void main();
 
 #endif

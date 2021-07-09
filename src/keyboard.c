@@ -1,10 +1,6 @@
 #include <keyboard.h>
 #include <ports_io.h>
 
-// TODO: WRITE GET_KEY_DOWN AND GET_KEY_UP FUNCTIONS
-
-enum key_down_or_up { ANY, DOWN, UP };
-
 /**
  * All ASCII characters for their corresponding scancodes
  * Use the scancode as the index to get the right character
@@ -40,7 +36,7 @@ void send_command(u8 command)
 }
 
 /**
- * Get scancode of last key press
+ * Get scancode as soon as one is in the keyboard output buffer
  */
 u8 get_scancode()
 {
@@ -64,6 +60,7 @@ u8 get_key(u8 type_specifying_and_val)
 	// to make sure waiting for key starts now and no previous press is detected
 	CLEAR_KEYBOARD_OUT_BUF();
 
+	// wait for specified kind of scancode only (pressed, releases or any)
 	do {
 		scancode = get_scancode();
 	} while (! (scancode & type_specifying_and_val) );

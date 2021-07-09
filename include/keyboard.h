@@ -3,6 +3,8 @@
 
 #include <types.h>
 
+// copied from jdah/tetris-os -> keyboard.h
+// maybe not perfectly correct
 #define KEY_NULL 0
 #define KEY_ESC 27
 #define KEY_BACKSPACE '\b'

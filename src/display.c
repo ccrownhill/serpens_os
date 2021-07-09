@@ -4,18 +4,18 @@
 
 char* VGA_MEMORY = (char*) (0xb8000);
 
-void print_char(char c, int col, int row, char attribute_byte)
+void print_char(char c, int col, int row, u8 appearance_byte)
 {
 	char* dest_address = VGA_MEMORY + 2 * (row * 80 + col);
 	dest_address[0] = c;
-	dest_address[1] = attribute_byte;
+	dest_address[1] = appearance_byte;
 }
 
-void print_left(char* msg, int col, int row)
+void print_left(char* msg, int col, int row, u8 appearance_byte)
 {
 	char* c;
 	for (c = msg; *c != '\0'; c++) {
-		print_char(*c, col, row, 0xf); // print in white
+		print_char(*c, col, row, appearance_byte);
 		col++;
 		if (col >= 80) {
 			col = 0;
@@ -29,10 +29,10 @@ void print_left(char* msg, int col, int row)
  * it only works if the text fits centered onto the specified location
  * into 1 row
  */
-void print_centered(char* msg, int msg_len, int col, int row)
+void print_centered(char* msg, int msg_len, int col, int row, u8 appearance_byte)
 {
 	col -= msg_len/2;
-	print_left(msg, col, row);
+	print_left(msg, col, row, appearance_byte);
 }
 
 void clear_screen()
