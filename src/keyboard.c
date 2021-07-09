@@ -2,7 +2,8 @@
 #include <ports_io.h>
 
 // TODO: WRITE GET_KEY_DOWN AND GET_KEY_UP FUNCTIONS
-// TODO: USE CLEAR_OUTPUT_BUFFER IN ALL FUNCTIONS THAT NEED IT
+
+enum key_down_or_up { ANY, DOWN, UP };
 
 /**
  * All ASCII characters for their corresponding scancodes
@@ -27,8 +28,7 @@ void init_keyboard()
 
 	// clear the keyboard output buffer as long as it is not empty
 	// (i.e. the first bit of the 0x64 status register is set)
-	while (port_byte_in(0x64) & 0x1)
-		port_byte_in(0x60);
+	CLEAR_KEYBOARD_OUT_BUF();
 }
 
 void send_command(u8 command)
@@ -50,40 +50,25 @@ u8 get_scancode()
 }
 
 /**
- * Return ASCII character of last pressed key
+ * Return ASCII character of next pressed or released key
+ * type_specifying_and_val will be either
+ *   ANY_CHECK_AND_VAL (0xff) to accept key press and releases
+ *   DOWN_CHECK_AND_VAL (0x7f) to accept only presses
+ *   or UP_CHECK_AND_VAL (0x80) to accept only releases
  */
-u8 getchar()
+u8 get_key(u8 type_specifying_and_val)
 {
-	u8 retchar;
-	u8 scancode = get_scancode();
-	retchar = scancode_set1_chars[scancode];
-	return retchar;
-}
+	u8 scancode;
 
-/**
- * Wait for key press and
- * return 1 if the pressed key matched the one specified by key_char
- * or else 0
- */
-u8 get_key_down(u8 key_char)
-{
 	// clear keyboard output buffer
 	// to make sure waiting for key starts now and no previous press is detected
-	while(port_byte_in(0x64) & 0x1)
-		port_byte_in(0x60);
+	CLEAR_KEYBOARD_OUT_BUF();
 
-	return (getchar() == key_char)
-}
+	do {
+		scancode = get_scancode();
+	} while (! (scancode & type_specifying_and_val) );
 
-u8 get_key_up(u8 key_char)
-{
-}
-
-// TODO: MAKE THIS AN INLINE FUNCTION IN .H OR SOME DEFINE FUNCTION
-void clean_output_buffer()
-{
-	while(port_byte_in(0x64) & 0x1)
-		port_byte_in(0x60);
+	return scancode_set1_chars[scancode & 0x7f];
 }
 
 /**

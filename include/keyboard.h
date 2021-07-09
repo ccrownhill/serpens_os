@@ -54,12 +54,31 @@
 #define KEY_MOD_NUM_LOCK 0x2000
 #define KEY_MOD_SCROLL_LOCK 0x4000
 
+/**
+ * scancodes will be "anded" with these values (scancode & _AND_VAL)
+ * if the resulting number of this and operation is non zero
+ * the condition expressed by the Macro name is correct
+ */
+#define ANY_CHECK_AND_VAL 0xff
+#define DOWN_CHECK_AND_VAL 0x7f
+#define UP_CHECK_AND_VAL 0x80
+
+/**
+ * clear the keyboard output buffer as long as it is not empty
+ * (i.e. the first bit of the 0x64 status register is set)
+ */
+#define CLEAR_KEYBOARD_OUT_BUF() ({\
+		while(port_byte_in(0x64) & 0x1) {\
+			port_byte_in(0x60);\
+		}\
+	})
+
 void send_command(u8 command);
 void init_keyboard();
 u8 get_scancode();
-u8 getchar();
-u8 get_key_down(u8 key_char);
-u8 get_key_up(u8 key_char);
+u8 get_key(u8 type_specifying_and_val);
+u8 get_key_down();
+u8 get_key_up();
 u8 get_scancode_set();
 
 #endif

@@ -17,10 +17,8 @@ void main()
 {
 	init_keyboard();
 	start_screen();
-	u8 retchar = getchar();
+	get_key(UP_CHECK_AND_VAL); // wait for release of any key
 	clear_screen();
-
-	print_char(retchar, 0, 24, 0xf); // print it in the lower left corner
 
 	print_centered("Tic-Tac-Toe Time!", 17, TITLE_COL, TITLE_ROW);
 	init_field();
