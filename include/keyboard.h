@@ -77,8 +77,6 @@ void send_command(u8 command);
 void init_keyboard();
 u8 get_scancode();
 u8 get_key(u8 type_specifying_and_val);
-u8 get_key_down();
-u8 get_key_up();
 u8 get_scancode_set();
 
 #endif
