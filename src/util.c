@@ -38,3 +38,10 @@ int strlen(char s[])
 		++i;
 	return i;
 }
+
+void memset(u8* dest, u8 val, u32 len)
+{
+	u8* temp = dest;
+	for (; len != 0; len--)
+		*temp++ = val;
+}
