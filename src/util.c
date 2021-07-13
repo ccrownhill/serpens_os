@@ -1,7 +1,7 @@
 #include <util.h>
 
 /**
- * int_to_ascii: convert num to characters in s
+ * int_to_ascii: convert n to characters in s
  * (K&R implementation)
  */
 void int_to_ascii(int n, char s[])

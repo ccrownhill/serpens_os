@@ -1,5 +1,5 @@
 #include <util.h>
-#include <interrupts.h>
+#include <idt.h>
 
 // irq handlers for all 256 interrupts
 struct idt_entry idt_entries[256];
@@ -7,13 +7,13 @@ struct idt_descriptor idt_desc;
 
 void init_idt()
 {
-	int i;
 	idt_desc.limit = sizeof(struct idt_entry) * 256 -1;
 	idt_desc.base  = (u32)&idt_entries;
 
-	memset(&idt_entries, 0, sizeof(struct idt_entry)*256);
+	memset((u8*)&idt_entries, 0, sizeof(struct idt_entry)*256);
 
 	// set all 48 ISRs by passing the function pointers as 32 bit numbers
+	// TODO: WHY IS IT FLAG 0x8e
 	idt_set_gate( 0, (u32)isr0 , 0x08, 0x8E);
 	idt_set_gate( 1, (u32)isr1 , 0x08, 0x8E);
 	idt_set_gate( 2, (u32)isr2 , 0x08, 0x8E);
@@ -64,7 +64,7 @@ void init_idt()
 	idt_set_gate(46, (u32)isr46, 0x08, 0x8E);
 	idt_set_gate(47, (u32)isr47, 0x08, 0x8E);
 
-	idt_flush((u32)&idt_desc);
+	flush_idt((u32)&idt_desc);
 }
 
 /**
@@ -72,20 +72,21 @@ void init_idt()
  * The irq handler is given as a function pointer that is casted to u32
  * which is better for doing the following assignments and calculations
  */
-void idt_set_gate(u8 irq_num, u32 irq_handler_fn_ptr, u16 selector, u8 flags)
+void idt_set_gate(u8 irq_num, u32 isr_fn_ptr, u16 selector, u8 flags)
 {
-	idt_entries[irq_num].base_lo = irq_handler_fn_ptr & 0xFFFF;          // lowest 16 bits
-	idt_entries[irq_num].base_hi = (irq_handler_fn_ptr >> 16) & 0xFFFF;  // highest 16 bits
+	idt_entries[irq_num].base_lo = isr_fn_ptr & 0xFFFF;          // lowest 16 bits
+	idt_entries[irq_num].base_hi = (isr_fn_ptr >> 16) & 0xFFFF;  // highest 16 bits
 
-	idt_entries[irq_num].sel     = selector;
+	idt_entries[irq_num].selector = selector;
 	idt_entries[irq_num].always0 = 0;
 	idt_entries[irq_num].flags   = flags;
 }
 
 /**
  * Load idt descriptor into idtr register with lidt
+ * idt_desc_ptr should be cast to u32
  */
-void flush_idt(struct idt_descriptor *idt_desc)
+void flush_idt(u32 idt_desc_ptr)
 {
-	__asm__("lidt (%%eax)" : : "a" (idt_desc));
+	__asm__("lidtl (%0)" : : "r" (idt_desc_ptr));
 }

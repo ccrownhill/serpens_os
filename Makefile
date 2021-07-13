@@ -17,7 +17,7 @@ all: boot.img
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
-kernel.bin: src/start.o $(OBJ)
+kernel.bin: src/start.o src/isrs.o $(OBJ)
 	ld -m elf_i386 -o $@ -Tlink.ld $^ --oformat binary
 
 boot.img: src/stage0.bin kernel.bin

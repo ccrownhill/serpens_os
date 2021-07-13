@@ -1,5 +1,5 @@
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
+#ifndef IDT_H
+#define IDT_H
 
 #include <types.h>
 
@@ -20,8 +20,7 @@ struct idt_descriptor {
 
 //#define NUM_ISRS 48
 
-// ISRs
-// from interrupts.asm
+// ISRs from isr.asm
 extern void isr0();
 extern void isr1();
 extern void isr2();
@@ -70,5 +69,9 @@ extern void isr44();
 extern void isr45();
 extern void isr46();
 extern void isr47();
+
+void init_idt();
+void idt_set_gate(u8 irq_num, u32 irq_handler_fn_ptr, u16 selector, u8 flags);
+void flush_idt(u32 idt_desc_ptr);
 
 #endif

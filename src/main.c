@@ -5,6 +5,7 @@
 #include <field.h>
 #include <keyboard.h>
 #include <util.h>
+#include <idt.h>
 
 void main()
 {
@@ -12,6 +13,9 @@ void main()
 	start_screen();
 	get_key(UP_CHECK_AND_VAL); // wait for release of any key
 	clear_screen();
+
+	init_idt();
+	__asm__("int $0x4"); // test interrupt handler
 
 	print_centered("Your turn! You have the X marks!", 32, TITLE_COL, TITLE_ROW - 2, WHITE);
 	print_centered("Enter a number from 1-9 to put your mark in the desired field!", 62, TITLE_COL, TITLE_ROW, WHITE);

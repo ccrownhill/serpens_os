@@ -1,8 +1,8 @@
 [bits 32]
-[extern main]
+[extern main] ; in main.c
 
 section .bss
-align 16
+align 32
 stack_bottom:
 resb 0x4000 ; 16 KiB
 stack_top:
