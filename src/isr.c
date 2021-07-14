@@ -4,8 +4,8 @@
 
 void isr_handler(struct registers regs)
 {
-	char ascii_interrupt[1];
+	char ascii_interrupt[5];
 	int_to_ascii(regs.int_no, ascii_interrupt);
-	print_left("received interrupt: ", 0, 23, WHITE);
-	print_left(ascii_interrupt, 30, 23, WHITE);
+	kprint_at("received interrupt: ", 0, 23, WHITE);
+	kprint(ascii_interrupt);
 }

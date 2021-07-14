@@ -8,7 +8,15 @@
 #define NUM_COLS 80
 #define NUM_ROWS 25
 
-#define GET_OFFSET(col, row) (char*)VGA_BUFFER + 2*(row*NUM_COLS + col)
+#define GET_OFFSET(col, row) 2*(row*NUM_COLS + col)
+#define GET_COL_FROM_OFFSET(offset) offset % (NUM_COLS*2)
+#define GET_ROW_FROM_OFFSET(offset) offset / (NUM_COLS*2)
+
+#define VGA_CTRL_REG 0x3d4
+#define VGA_DATA_REG 0x3d5
+
+#define CURSOR_OFFSET_HIGH_BYTE_REG 0xe
+#define CURSOR_OFFSET_LOW_BYTE_REG 0xf
 
 /**
  * 16 VGA colors for VGA text mode 0x3
@@ -32,8 +40,11 @@
 #define WHITE 0xf
 
 void print_char(char c, int col, int row, u8 appearance_byte);
-void print_left(char* msg, int col, int row, u8 appearance_byte);
-void print_centered(char* msg, int msg_len, int col, int row, u8 appearance_byte);
+void kprint(char* msg);
+void kprint_at(char* msg, int col, int row, u8 appearance_byte);
+void kprint_centered(char* msg, int msg_len, int col, int row, u8 appearance_byte);
 void clear_screen();
+u16 get_cursor_offset();
+void set_cursor_offset(u16 offset);
 
 #endif
