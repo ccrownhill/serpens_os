@@ -3,8 +3,12 @@
 
 #include <types.h>
 
-#define MAX_COLS 80
-#define MAX_ROWS 25
+#define VGA_BUFFER 0xb8000
+
+#define NUM_COLS 80
+#define NUM_ROWS 25
+
+#define GET_OFFSET(col, row) (char*)VGA_BUFFER + 2*(row*NUM_COLS + col)
 
 /**
  * 16 VGA colors for VGA text mode 0x3
