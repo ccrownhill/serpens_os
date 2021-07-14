@@ -19,7 +19,6 @@ void main()
 
 	kprint_centered("Your turn! You have the X marks!", 32, TITLE_COL, TITLE_ROW - 2, WHITE);
 	kprint_centered("Enter a number from 1-9 to put your mark in the desired field!", 62, TITLE_COL, TITLE_ROW, WHITE);
-  kprint("test");
 	init_field();
 
 	while(1);

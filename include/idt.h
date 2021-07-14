@@ -18,8 +18,6 @@ struct idt_descriptor {
 	u32 base;
 } __attribute__((packed)); // prevent compiler optimization
 
-//#define NUM_ISRS 48
-
 // ISRs from isr.asm
 extern void isr0();
 extern void isr1();

@@ -1,6 +1,11 @@
-/* Display driver */
-
-// TODO Fix kprint because it does not print correctly after the last print
+/**
+ * Display driver *
+ *
+ * Note: The functions that deal with the setting or reading the VGA text mode
+ * cursor are not really necessary so that everything works properly. They are
+ * only needed for the kprint() function. I added them because I wanted to learn
+ * how dealing with the cursor works.
+ */
 
 #include <display.h>
 #include <ports_io.h>
