@@ -16,6 +16,6 @@ struct registers {
 	u32 eip, cs, eflags, useresp, ss; // pushed by processor automatically
 };
 
-void isr_handler(struct registers regs);
+void isr_exception_handler(struct registers);
 
 #endif

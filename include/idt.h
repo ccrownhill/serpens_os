@@ -4,19 +4,30 @@
 #include <types.h>
 
 // structure of interrupt gate
-struct idt_entry {
-	u16 base_lo;
-	u16 selector;
-	u8 always0;
-	u8 flags;
-	u16 base_hi;
-} __attribute__((packed)); // prevent compiler optimization
+typedef struct idt_entry {
+  u16 isr_low;
+  u16 kernel_cs;
+  u8 reserved; // always 0
+  u8 type_attr;
+  u16 isr_high;
+} __attribute__((packed)) idt_entry_t; // prevent compiler optimization
 
 // structure of IDT descriptor pointing to an array of interrupt handlers
-struct idt_descriptor {
-	u16 limit; // the size of the array with all 256 interrupt handlers
-	u32 base;
-} __attribute__((packed)); // prevent compiler optimization
+typedef struct idt_descriptor {
+  u16 limit; // the size of the array with all 256 interrupt handlers
+  u32 base;
+} __attribute__((packed)) idt_desc_t; // prevent compiler optimization
+
+// Code segment
+#define KERNEL_CS 0x8
+
+// 0x8e: type_attr value consists of
+//     P = 0b1 (interrupt is used)
+//     DPL = 0b00 (descriptor privilege level; 0 for highest level)
+//     S = 0b0 (storage segment; 0 because interrupt gate is used)
+//     Type = 0b1110 (for a 32 bit interrupt gate)
+// ==> type_attr = 1000 1110 = 0x8e
+#define PRIVILEGED_INTERRUPT_GATE_TYPE_ATTR 0x8e
 
 // ISRs from isr.asm
 extern void isr0();
@@ -69,7 +80,7 @@ extern void isr46();
 extern void isr47();
 
 void init_idt();
-void idt_set_gate(u8 irq_num, u32 irq_handler_fn_ptr, u16 selector, u8 flags);
-void flush_idt(u32 idt_desc_ptr);
+void idt_set_gate(u8, u32, u16, u8);
+void flush_idt(u32);
 
 #endif
