@@ -1,5 +1,6 @@
 #include <keyboard.h>
 #include <ports_io.h>
+#include <irq.h>
 
 /**
  * All ASCII characters for their corresponding scancodes
@@ -25,6 +26,21 @@ void init_keyboard()
 	// clear the keyboard output buffer as long as it is not empty
 	// (i.e. the first bit of the 0x64 status register is set)
 	CLEAR_KEYBOARD_OUT_BUF();
+
+  // install keyboard IRQ handler on IRQ1
+  install_irq_handler(1, keyboard_irq_handler);
+}
+
+/**
+ * This function is called every time IRQ1 is encountered
+ * which happens every time a key is pressed
+ * That's why then this function can read the keyboard output buffer
+ * immediately without checking whether it is full
+ */
+void keyboard_irq_handler(struct registers *regs)
+{
+  u8 scancode = port_byte_in(0x60);
+  kprint("keyboard input");
 }
 
 void send_command(u8 command)

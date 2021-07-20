@@ -2,6 +2,7 @@
 #define KEYBOARD_H
 
 #include <types.h>
+#include <isr.h> // for `struct registers`
 
 // copied from jdah/tetris-os -> keyboard.h
 // maybe not perfectly correct
@@ -75,8 +76,9 @@
 		}\
 	})
 
-void send_command(u8 command);
 void init_keyboard();
+void keyboard_irq_handler(struct registers *);
+void send_command(u8 command);
 u8 get_scancode();
 u8 get_key(u8 type_specifying_and_val);
 u8 get_scancode_set();

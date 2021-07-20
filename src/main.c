@@ -30,7 +30,7 @@ void main()
   get_key(UP_CHECK_AND_VAL); // wait for release of any key
   clear_screen();
 
-  __asm__("int $33"); // test interrupt handler
+  __asm__("int $35"); // test interrupt handler
 
   kprint_centered("Your turn! You have the X marks!", 32, TITLE_COL, TITLE_ROW - 2, WHITE);
   kprint_centered("Enter a number from 1-9 to put your mark in the desired field!", 62, TITLE_COL, TITLE_ROW, WHITE);

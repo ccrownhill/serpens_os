@@ -18,7 +18,10 @@
 
 #define PIC_EOI_COMMAND 0x20 // End of Interrupt command
 
+#define FIRST_IRQ 0x20 // 32
+
 void pic_setup_with_irq_remap();
 void irq_handler(struct registers);
+void install_irq_handler(int, void (*)(struct registers *));
 
 #endif
