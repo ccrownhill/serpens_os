@@ -12,7 +12,7 @@ all: boot.img
 	nasm -f bin -o $@ $<
 
 %.o: %.asm
-	nasm -f elf -o $@ $<
+	nasm -f elf32 -o $@ $<
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
