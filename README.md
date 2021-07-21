@@ -8,3 +8,5 @@ Current state:
 1. Got VGA screen driver to work for displaying basic text.
 1. Got keyboard polling driver to work.
 1. Setup idt and successfully tested it with a test interrupt.
+
+TODO: Check if direction flag should be finally set or not (cld and std)
