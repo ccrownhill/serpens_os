@@ -2,21 +2,21 @@
 ; because some interrupts push an error code
 ; here 0 is pushed as a dummy error code
 %macro ISR_NO_ERRCODE 1  ; define a macro, taking one parameter
-	[global isr%1]        ; %1 accesses the first parameter.
-	isr%1:
-		cli
-		push byte 0 ; push dummy error code
-		push byte %1
-		jmp isr_exception_common
+  [global isr%1]        ; %1 accesses the first parameter.
+  isr%1:
+    cli
+    push byte 0 ; push dummy error code
+    push byte %1
+    jmp isr_exception_common
 %endmacro
 
 ; macro for ISRs with error code
 %macro ISR_ERRCODE 1
-	[global isr%1]
-	isr%1:
-		cli
-		push byte %1
-		jmp isr_exception_common
+  [global isr%1]
+  isr%1:
+    cli
+    push byte %1
+    jmp isr_exception_common
 %endmacro
 
 ; macro for ISRs for interrupts and not exceptions
@@ -88,36 +88,36 @@ ISR_INTERRUPT 47
 ; before restoring the stack frame
 ; for all exceptions 0-31
 isr_exception_common:
-	pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
-	mov ax, ds
-	push eax
+  pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+  mov ax, ds
+  push eax
 
-	; setup segment registers
-	mov ax, 0x10 ; 0x10 is the data segment
-	mov ds, ax
-	mov es, ax,
-	mov fs, ax
-	mov gs, ax
+  ; setup segment registers
+  mov ax, 0x10 ; 0x10 is the data segment
+  mov ds, ax
+  mov es, ax,
+  mov fs, ax
+  mov gs, ax
 
-	; call C-level handler function
-	call isr_exception_handler
+  ; call C-level handler function
+  call isr_exception_handler
 
-	pop eax ; reload original data segment descriptor
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	popa ; Pops edi,esi,ebp,esp,ebx,edx,ecx,eax
+  pop eax ; reload original data segment descriptor
+  mov ds, ax
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+  popa ; Pops edi,esi,ebp,esp,ebx,edx,ecx,eax
 
-	; reset stack to what it was
-	; before isr[n]() function pushed err code and isr number
-	add esp, 8
-	sti ; reenable interrupts
+  ; reset stack to what it was
+  ; before isr[n]() function pushed err code and isr number
+  add esp, 8
+  sti ; reenable interrupts
 
-	; pop CS, EIP, EFLAGS, SS, and ESP
-	; this was automatically pushed by the processor back when the interrupt
-	; first happened
-	iret
+  ; pop CS, EIP, EFLAGS, SS, and ESP
+  ; this was automatically pushed by the processor back when the interrupt
+  ; first happened
+  iret
 
 ; in irq.c
 [extern irq_handler]
@@ -125,33 +125,33 @@ isr_exception_common:
 ; before restoring the stack frame
 ; for all interrupts 32-47
 isr_interrupt_common:
-	pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
-	mov ax, ds
-	push eax
+  pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+  mov ax, ds
+  push eax
 
-	; setup segment registers
-	mov ax, 0x10 ; 0x10 is the data segment
-	mov ds, ax
-	mov es, ax,
-	mov fs, ax
-	mov gs, ax
+  ; setup segment registers
+  mov ax, 0x10 ; 0x10 is the data segment
+  mov ds, ax
+  mov es, ax,
+  mov fs, ax
+  mov gs, ax
 
-	; call C-level handler function
-	call irq_handler
+  ; call C-level handler function
+  call irq_handler
 
-	pop eax ; reload original data segment descriptor
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	popa ; Pops edi,esi,ebp,esp,ebx,edx,ecx,eax
+  pop eax ; reload original data segment descriptor
+  mov ds, ax
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+  popa ; Pops edi,esi,ebp,esp,ebx,edx,ecx,eax
 
-	; reset stack to what it was
-	; before isr[n]() function pushed err code and isr number
-	add esp, 8
-	sti ; reenable interrupts
+  ; reset stack to what it was
+  ; before isr[n]() function pushed err code and isr number
+  add esp, 8
+  sti ; reenable interrupts
 
-	; pop CS, EIP, EFLAGS, SS, and ESP
-	; this was automatically pushed by the processor back when the interrupt
-	; first happened
-	iret
+  ; pop CS, EIP, EFLAGS, SS, and ESP
+  ; this was automatically pushed by the processor back when the interrupt
+  ; first happened
+  iret

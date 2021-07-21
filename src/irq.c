@@ -7,7 +7,7 @@ void (*irq_handlers[16])(struct registers *) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 void pic_setup_with_irq_remap()
 {
-	__asm__("sti"); // enable interrupts (sets interrupt flag)
+  __asm__("sti"); // enable interrupts (sets interrupt flag)
 
   // save masks (for later restoration)
   u8 mask1 = port_byte_in(PIC1_DATA);

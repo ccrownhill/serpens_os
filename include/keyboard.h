@@ -71,10 +71,10 @@
  * (i.e. the first bit of the 0x64 status register is set)
  */
 #define CLEAR_KEYBOARD_OUT_BUF() ({\
-		while(port_byte_in(0x64) & 0x1) {\
-			port_byte_in(0x60);\
-		}\
-	})
+    while(port_byte_in(0x64) & 0x1) {\
+      port_byte_in(0x60);\
+    }\
+  })
 
 void init_keyboard();
 void keyboard_irq_handler(struct registers *);
