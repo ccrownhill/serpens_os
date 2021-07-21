@@ -8,3 +8,11 @@ Current state:
 1. Got VGA screen driver to work for displaying basic text.
 1. Got keyboard polling driver to work.
 1. Setup idt and successfully tested it with a test interrupt.
+
+## Compilation
+
+To be able to compile this OS and run it using the Makefile included here you need to create an `i686-elf` cross compiler.
+
+See [this](https://wiki.osdev.org/GCC_Cross-Compiler) article from the osdev.org Wiki.
+
+In addition to the steps from this article you also need to compile NASM for `i686-elf`.
