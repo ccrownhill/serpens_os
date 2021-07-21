@@ -1,6 +1,7 @@
 #include <keyboard.h>
 #include <ports_io.h>
 #include <irq.h>
+#include <display.h> // for printing
 
 /**
  * All ASCII characters for their corresponding scancodes
