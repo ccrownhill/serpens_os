@@ -14,11 +14,6 @@ entry:
 	mov al, 0x3
 	int 0x10
 
-	; video mode: 320x200 @ 16 colors
-	;mov ah, 0x0
-	;mov al, 0xd
-	;int 0x10
-
 read_disk:
 	; get info about disk
 	;mov ah, 0x8
@@ -56,7 +51,7 @@ switch_to_pm:
 	; disable interrupts
 	cli
 	; clear direction flag
-	;cld
+	cld
 
 	; Set the A20 line
 	in al, 0x92
