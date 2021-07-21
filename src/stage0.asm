@@ -93,12 +93,6 @@ pm_entry:
 	; continue execution in kernel with jump
 	jmp 0x10000 ; this address was set to 0x1000:0x0 when loading the kernel from disk
 
-	; print P character with VGA text mode buffer on 3rd line
-	;mov byte [0xb8140], 'H'
-	;mov byte [0xb8141], 0xf ; white on black
-	;mov byte [0xb8142], 'i'
-	;mov byte [0xb8143], 0xf
-
 [bits 16]
 print:
 	; print the string with first character address stored in si
