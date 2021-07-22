@@ -23,6 +23,7 @@ read_disk:
   ;xor dx, dx
   ;mov dl, cl
   ;call print_hex
+  ;jmp $
 
   ; Extended read with LBA addressing
   mov ah, 0x42
@@ -33,7 +34,7 @@ read_disk:
 
   ; otherwise fall back to CHS read
   mov ah, 0x2 ; read disk sectors into memory
-  mov al, [num_sectors] ; read 0x20 sectors
+  mov al, [num_sectors] ; read num_sectors sectors
   mov ch, 0x0 ; cylinder 0x0
   mov dh, 0x0 ; head 0x0
   mov cl, chs_sector
