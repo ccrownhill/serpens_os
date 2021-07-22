@@ -14,39 +14,68 @@ entry:
   mov al, 0x3
   int 0x10
 
-read_disk:
-  ; get info about disk
-  ;mov ah, 0x8
-  ;mov dl, 0x80
-  ;int 0x13
-  ;and cl, 0x3f ; make cl contain the maximum number of sectors per cylinder/track
-  ;xor dx, dx
-  ;mov dl, cl
-  ;call print_hex
-  ;jmp $
+get_disk_info:
+  mov ah, 0x8
+  mov dl, 0x80
+  int 0x13
+  and cl, 0x3f ; make cl contain the maximum number of sectors per cylinder/track
+  mov byte [sectors_per_track], cl
 
+  jmp chs_read
+
+lba_extended_read:
   ; Extended read with LBA addressing
   mov ah, 0x42
   mov dl, drive_num ; drive number
   mov si, disk_address_packet
   int 0x13
-  jnc switch_to_pm ; if the read succeeded
+  jnc lba_next_sector ; if the read succeeded
 
+chs_read:
   ; otherwise fall back to CHS read
   mov ah, 0x2 ; read disk sectors into memory
-  mov al, [num_sectors] ; read num_sectors sectors
-  mov ch, 0x0 ; cylinder 0x0
-  mov dh, 0x0 ; head 0x0
-  mov cl, chs_sector
+  mov al, [num_sectors]
+  mov ch, [chs_cylinder]
+  mov dh, [chs_head]
+  mov cl, [chs_sector]
   mov dl, drive_num
 
   ; load the next sectors at memory address es:bx 0x1000:0x0000 --> kernel at 0x10000
   mov bx, 0x1000 ; es can't be set directly
   mov es, bx
-  xor bx, bx
+  mov bx, [offset]
   int 0x13
 
-  jc disk_error ; carry flag is set on error
+  jnc chs_next_sector
+  jmp disk_error ; carry flag is set on error
+
+lba_next_sector:
+  inc byte [sectors_read]
+  cmp byte [sectors_read], total_sectors_num
+  je switch_to_pm ; check if all desired sectors were read
+
+  add word [offset], sector_size 
+  inc dword [sector]
+  jmp lba_extended_read
+
+chs_next_sector:
+  inc byte [sectors_read]
+  cmp byte [sectors_read], total_sectors_num
+  je switch_to_pm ; check if all desired sectors were read
+
+  add word [offset], sector_size
+  inc byte [chs_sector]
+  mov bl, [sectors_per_track]
+  cmp byte [chs_sector], bl
+  jg next_cylinder
+  jmp chs_read
+
+next_cylinder:
+  mov byte [chs_sector], 0x0
+  add byte [chs_cylinder], 0x1
+  jmp chs_read
+
+next_head:
 
 switch_to_pm:
   ; disable interrupts
@@ -155,16 +184,22 @@ DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 ; parameters for reading from disk
 drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
 ; for CHS
-;chs_cylinder equ 0x0
-;chs_head equ 0x0
-chs_sector equ 0x2 ; sector 2 (the one after the bootsector)
+chs_cylinder: db 0x0
+chs_head: db 0x0
+chs_sector: db 0x2 ; sector 2 (the one after the bootsector)
+
+sectors_per_track: db 0x0 ; will be initialized by getting disk info with ah=0x8
+
+total_sectors_num equ 0x20
+sector_size equ 512
+sectors_read: db 0
 
 ; used for Extended Read from disk
 disk_address_packet:
   db 0x10 ; size of DAP
   db 0x0 ; unused
 num_sectors:
-  dw 0x20
+  dw 0x1 ; read one sector after the other
 offset:
   dw 0x0
 mem_segment:
