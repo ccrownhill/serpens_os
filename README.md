@@ -13,6 +13,6 @@ Current state:
 
 To be able to compile this OS and run it using the Makefile included here you need to create an `i686-elf` cross compiler.
 
-See [this](https://wiki.osdev.org/GCC_Cross-Compiler) article from the osdev.org Wiki.
+See [this](https://wiki.osdev.org/GCC_Cross-Compiler) article from the osdev.org Wiki on how to compile `binutils` and `gcc` for `i686-elf`.
 
-In addition to the steps from this article you also need to compile NASM for `i686-elf`.
+In addition to that `nasm` needs to be installed (just use the standard package from your distribution package manager).

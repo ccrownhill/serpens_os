@@ -2,7 +2,6 @@
 # which is why the compilation will only work if such a cross compiler is present
 
 CC = i686-elf-gcc
-NASM = i686-elf-nasm
 LD = i686-elf-ld
 CFLAGS = -Wall -Wextra -ffreestanding
 INCS = -Iinclude
@@ -14,10 +13,10 @@ OBJ = $(SRC:.c=.o)
 all: boot.img
 
 %.bin: %.asm
-	$(NASM) -f bin -o $@ $<
+	nasm -f bin -o $@ $<
 
 %.o: %.asm
-	$(NASM) -f elf -o $@ $<
+	nasm -f elf32 -o $@ $<
 
 %.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
