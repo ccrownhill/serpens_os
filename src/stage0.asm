@@ -2,6 +2,15 @@
 [bits 16]
 
 entry:
+  ; disable interrupts
+  cli
+  ; clear direction flag
+  cld
+
+  xor ax, ax
+  mov es, ax
+  mov ds, ax
+
   ; init stack by setting stack pointer to some empty memory region
   ; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
   mov sp, 0x3000
@@ -21,7 +30,8 @@ get_disk_info:
   and cl, 0x3f ; make cl contain the maximum number of sectors per cylinder/track
   mov byte [sectors_per_track], cl
 
-  jmp chs_read
+read_disk:
+  mov di, max_disk_read_tries
 
 lba_extended_read:
   ; Extended read with LBA addressing
@@ -29,7 +39,14 @@ lba_extended_read:
   mov dl, drive_num ; drive number
   mov si, disk_address_packet
   int 0x13
-  jnc lba_next_sector ; if the read succeeded
+  ;jnc lba_next_sector ; if the read succeeded
+  jnc switch_to_pm
+  jmp try_disk_read_again
+
+try_disk_read_again:
+  dec di
+  jz disk_error
+  jmp lba_extended_read
 
 chs_read:
   ; otherwise fall back to CHS read
@@ -46,8 +63,9 @@ chs_read:
   mov bx, [offset]
   int 0x13
 
-  jnc chs_next_sector
-  jmp disk_error ; carry flag is set on error
+  ;jnc chs_next_sector
+  jnc switch_to_pm ; carry flag is set on error
+  jmp disk_error 
 
 lba_next_sector:
   inc byte [sectors_read]
@@ -58,31 +76,26 @@ lba_next_sector:
   inc dword [sector]
   jmp lba_extended_read
 
-chs_next_sector:
-  inc byte [sectors_read]
-  cmp byte [sectors_read], total_sectors_num
-  je switch_to_pm ; check if all desired sectors were read
-
-  add word [offset], sector_size
-  inc byte [chs_sector]
-  mov bl, [sectors_per_track]
-  cmp byte [chs_sector], bl
-  jg next_cylinder
-  jmp chs_read
-
-next_cylinder:
-  mov byte [chs_sector], 0x0
-  add byte [chs_cylinder], 0x1
-  jmp chs_read
+;chs_next_sector:
+;  inc byte [sectors_read]
+;  cmp byte [sectors_read], total_sectors_num
+;  je switch_to_pm ; check if all desired sectors were read
+;
+;  add word [offset], sector_size
+;  inc byte [chs_sector]
+;  mov bl, [sectors_per_track]
+;  cmp byte [chs_sector], bl
+;  jg next_cylinder
+;  jmp chs_read
+;
+;next_cylinder:
+;  mov byte [chs_sector], 0x0
+;  add byte [chs_cylinder], 0x1
+;  jmp chs_read
 
 next_head:
 
 switch_to_pm:
-  ; disable interrupts
-  cli
-  ; clear direction flag
-  cld
-
   ; Set the A20 line
   in al, 0x92
   or al, 2
@@ -183,6 +196,7 @@ DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 
 ; parameters for reading from disk
 drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
+max_disk_read_tries equ 5
 ; for CHS
 chs_cylinder: db 0x0
 chs_head: db 0x0
@@ -194,12 +208,13 @@ total_sectors_num equ 0x20
 sector_size equ 512
 sectors_read: db 0
 
+align 8
 ; used for Extended Read from disk
 disk_address_packet:
   db 0x10 ; size of DAP
   db 0x0 ; unused
 num_sectors:
-  dw 0x1 ; read one sector after the other
+  dw 0x20 ; read one sector after the other
 offset:
   dw 0x0
 mem_segment:
