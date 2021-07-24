@@ -106,7 +106,7 @@ try_disk_read_again:
   int 0x13
   dec di
   ;jnz chs_read_sector ; UNCOMMENT THIS FOR CHS READ
-  jnz lba_read_sector
+  jnz lba_read_sector ; AND THEN COMMENT OUT THIS LINE
   jmp disk_error
 
 switch_to_pm:
