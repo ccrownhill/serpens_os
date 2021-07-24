@@ -25,10 +25,9 @@ kernel.bin: src/start.o src/isrs.o $(OBJ)
 	i686-elf-ld -o $@ -Tlink.ld $^ --oformat binary
 
 boot.img: src/stage0.bin kernel.bin
-	#dd if=/dev/zero of=boot.img bs=512 count=70
-	#dd if=bootsect.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
-	#dd if=main.bin of=boot.img conv=notrunc bs=512 seek=1 count=69
-	cat $^ > $@
+	dd if=/dev/zero of=boot.img bs=512 count=7000
+	dd if=src/stage0.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
+	dd if=kernel.bin of=boot.img conv=notrunc bs=512 seek=1 count=6999
 
 boot: boot.img
 	qemu-system-i386 -drive format=raw,file=$< -d cpu_reset
