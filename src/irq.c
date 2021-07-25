@@ -41,15 +41,9 @@ void irq_handler(struct registers regs)
 {
   void (*handler)(struct registers*);
   handler = irq_handlers[regs.int_no - FIRST_IRQ];
-  if (handler) {
-    kprint("handler");
-    handler(&regs);
-  }
 
-  char ascii_interrupt[4];
-  int_to_ascii(regs.int_no-FIRST_IRQ, ascii_interrupt);
-  kprint_at("Received interrupt: ", 0, 23, WHITE);
-  kprint(ascii_interrupt);
+  if (handler)
+    handler(&regs);
 
   // Send End Of Interrupt to master (and maybe slave) PIC
   if (regs.int_no >= FIRST_IRQ+8) // check if IRQ is from the Slave PIC (IRQ 8-15)

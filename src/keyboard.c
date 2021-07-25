@@ -19,6 +19,8 @@ u8 scancode_set1_chars[128] = {
   KEY_PAGE_DOWN, KEY_INSERT, KEY_DELETE, 0, 0, 0, KEY_F11, KEY_F12
 };
 
+keyboard_input_t keyboard_input;
+
 void init_keyboard()
 {
   // activate keyboard by enabling scanning
@@ -41,7 +43,8 @@ void init_keyboard()
 void keyboard_irq_handler(struct registers *regs)
 {
   u8 scancode = port_byte_in(0x60);
-  kprint("keyboard input");
+  keyboard_input.is_key_pressed = IS_KEY_DOWN(scancode);
+  keyboard_input.key_code = scancode_set1_chars[scancode & 0x7f];
 }
 
 void send_command(u8 command)
@@ -60,29 +63,6 @@ u8 get_scancode()
   // wait until output buffer is full
   while (!(port_byte_in(0x64) & 0x1)) {}
   return port_byte_in(0x60);
-}
-
-/**
- * Return ASCII character of next pressed or released key
- * type_specifying_and_val will be either
- *   ANY_CHECK_AND_VAL (0xff) to accept key press and releases
- *   DOWN_CHECK_AND_VAL (0x7f) to accept only presses
- *   or UP_CHECK_AND_VAL (0x80) to accept only releases
- */
-u8 get_key(u8 type_specifying_and_val)
-{
-  u8 scancode;
-
-  // clear keyboard output buffer
-  // to make sure waiting for key starts now and no previous press is detected
-  CLEAR_KEYBOARD_OUT_BUF();
-
-  // wait for specified kind of scancode only (pressed, releases or any)
-  do {
-    scancode = get_scancode();
-  } while (! (scancode & type_specifying_and_val) );
-
-  return scancode_set1_chars[scancode & 0x7f];
 }
 
 /**

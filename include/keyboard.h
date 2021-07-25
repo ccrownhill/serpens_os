@@ -63,8 +63,8 @@
  * the condition expressed by the Macro name is correct
  */
 #define ANY_CHECK_AND_VAL 0xff
-#define DOWN_CHECK_AND_VAL 0x7f
-#define UP_CHECK_AND_VAL 0x80
+#define IS_KEY_UP(scancode) (scancode & 0x80)
+#define IS_KEY_DOWN(scancode) (!IS_KEY_UP(scancode))
 
 /**
  * clear the keyboard output buffer as long as it is not empty
@@ -75,6 +75,18 @@
       port_byte_in(0x60);\
     }\
   })
+ 
+typedef struct keyboard_input {
+  u8 is_key_pressed; // true or false value whether any key is pressed
+
+  // the keycode of the pressed key
+  // (the ASCII code for all alphabetical keys and the defined scancode values
+  // from above for all other keys)
+  u8 key_code;
+} keyboard_input_t;
+
+// defined in keyboard.c
+extern keyboard_input_t keyboard_input;
 
 void init_keyboard();
 void keyboard_irq_handler(struct registers *);
