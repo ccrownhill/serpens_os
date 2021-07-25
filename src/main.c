@@ -30,6 +30,8 @@ void main()
   while (!keyboard_input.is_key_pressed);
 
   init_snake_ui();
+  init_snake();
+  draw_snake();
 
   while(1);
 }

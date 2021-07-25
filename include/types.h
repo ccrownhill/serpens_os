@@ -9,4 +9,6 @@ typedef short s16;
 typedef unsigned char u8;
 typedef char s8;
 
+#define NULL 0
+
 #endif
