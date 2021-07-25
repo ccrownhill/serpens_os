@@ -1,4 +1,6 @@
-# TicTacToe in an OS
+# Snake in an OS
+
+This is an Operating System that boots up and starts a game of Snake.
 
 Current state: 
 
