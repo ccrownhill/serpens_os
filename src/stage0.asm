@@ -119,7 +119,7 @@ switch_to_pm:
   xor ax, ax
   mov ds, ax
 
-  ; load GDT
+  ; load GDT descriptor table
   lgdt [gdt_desc]
   
   ; enable protected mode
@@ -128,6 +128,7 @@ switch_to_pm:
   mov cr0, eax
 
   ; transition to 32 bit code in code segment
+  ; and flush the GDT
   jmp 0x8:pm_entry
 
 
@@ -240,22 +241,27 @@ sector:
   dd 0x0 ; upper bits
 
 ; GDT
+; setup a basic flat memory model
+; where code and data segment both span the whole address space (0x00000000-0xffffffff)
+; that way the OS has access to a continuous, unsegmented address space
 align 8
 gdt_start:
 gdt_null_segment:
   dq 0
+; A separate code segment is needed because it must reference a descriptor
+; that is set as a 'code segment' in the Access flags below
 gdt_code_segment:
-  dw 0xffff
-  dw 0
-  db 0
-  db 0b10011010
-  db 0b11001111
-  db 0
+  dw 0xffff // lower 16 bits of limit
+  dw 0 // lower 16 bits of the base
+  db 0 // next 8 bits of base
+  db 0b10011010 // Access flags; What ring can this segment be used in?
+  db 0b11001111 // granularity (the lower 2 bytes are the higher 16 bits of the limit)
+  db 0 // last 8 bits of base
 gdt_data_segment:
   dw 0xffff
   dw 0
   db 0
-  db 0b10010010
+  db 0b10010010 ; the data segments need the segment type access flag set to 0 (indicating a data segment)
   db 0b11001111
   db 0
 gdt_end:
