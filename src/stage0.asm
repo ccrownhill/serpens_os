@@ -251,12 +251,12 @@ gdt_null_segment:
 ; A separate code segment is needed because it must reference a descriptor
 ; that is set as a 'code segment' in the Access flags below
 gdt_code_segment:
-  dw 0xffff // lower 16 bits of limit
-  dw 0 // lower 16 bits of the base
-  db 0 // next 8 bits of base
-  db 0b10011010 // Access flags; What ring can this segment be used in?
-  db 0b11001111 // granularity (the lower 2 bytes are the higher 16 bits of the limit)
-  db 0 // last 8 bits of base
+  dw 0xffff ; lower 16 bits of limit
+  dw 0 ; lower 16 bits of the base
+  db 0 ; next 8 bits of base
+  db 0b10011010 ; Access flags; What ring can this segment be used in?
+  db 0b11001111 ; granularity (the lower 2 bytes are the higher 16 bits of the limit)
+  db 0 ; last 8 bits of base
 gdt_data_segment:
   dw 0xffff
   dw 0
