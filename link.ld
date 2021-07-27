@@ -2,30 +2,22 @@ OUTPUT_FORMAT("binary")
 ENTRY(_start)
 SECTIONS
 {
-  . = 0x10000;
+  . = 0x10000; /* kernel will be loaded at this address */
 
-  .text ALIGN(4K) :
+  .text : ALIGN(0x1000) /* Align to 4096 bytes */
   {
     *(.text)
   }
 
-  /* Read-only data. */
-  /* commented out because it is not necessary
-  .rodata ALIGN(4K) :
-  {
-    *(.rodata)
-  }
-  */
-
   /* Data (initialized) */
-  .data ALIGN(4K) :
+  .data : ALIGN(0x1000)
   {
     *(.data) /* read-write */
     *(.rodata) /* read-only */
   }
 
   /* Read-write data (uninitialized) and stack */
-  .bss ALIGN(4K) :
+  .bss : ALIGN(0x1000)
   {
     *(.bss)
   }
