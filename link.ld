@@ -4,26 +4,32 @@ SECTIONS
 {
   . = 0x10000;
 
-  .text BLOCK(4K) : ALIGN(4K)
+  .text ALIGN(4K) :
   {
     *(.text)
   }
 
   /* Read-only data. */
-  .rodata BLOCK(4K) : ALIGN(4K)
+  /* commented out because it is not necessary
+  .rodata ALIGN(4K) :
   {
     *(.rodata)
   }
+  */
 
-  /* Read-write data (initialized) */
-  .data BLOCK(4K) : ALIGN(4K)
+  /* Data (initialized) */
+  .data ALIGN(4K) :
   {
-    *(.data)
+    *(.data) /* read-write */
+    *(.rodata) /* read-only */
   }
 
   /* Read-write data (uninitialized) and stack */
-  .bss BLOCK(4K) : ALIGN(4K)
+  .bss ALIGN(4K) :
   {
     *(.bss)
   }
+
+  /* to find out kernel end address in kernel */
+  _kernelend = .;
 }

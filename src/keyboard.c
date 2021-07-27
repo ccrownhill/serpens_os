@@ -31,7 +31,7 @@ void init_keyboard()
   CLEAR_KEYBOARD_OUT_BUF();
 
   // install keyboard IRQ handler on IRQ1
-  install_irq_handler(1, keyboard_irq_handler);
+  install_irq_handler(KEYBOARD_IRQ, keyboard_irq_handler);
 }
 
 /**

@@ -20,6 +20,9 @@
 
 #define FIRST_IRQ 0x20 // 32
 
+#define TIMER_IRQ 0
+#define KEYBOARD_IRQ 1
+
 void pic_setup_with_irq_remap();
 void irq_handler(struct registers);
 void install_irq_handler(int, void (*)(struct registers *));

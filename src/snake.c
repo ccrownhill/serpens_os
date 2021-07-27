@@ -13,7 +13,7 @@ snake_part* snake_rear;
 
 void init_snake()
 {
-  snake_head = (snake_part*)malloc(sizeof(snake_part));
+  //snake_head = (snake_part*)malloc(sizeof(snake_part)); MALLOC NOT IMPLEMENTED YET
   snake_head->x_pos = SNAKE_INIT_X;
   snake_head->y_pos = SNAKE_INIT_Y;
   snake_head->next = NULL;
