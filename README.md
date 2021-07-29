@@ -1,5 +1,7 @@
 # Snake in an OS
 
+This is WORK IN PROGRESS.
+
 This is an Operating System that boots up and starts a game of Snake.
 
 Current state: 
@@ -9,7 +11,8 @@ Current state:
 1. Got into 32 bit protected mode and printed Hi on third line with VGA text mode buffer at 0xb8000 to confirm that the switch was successful
 1. Got VGA screen driver to work for displaying basic text.
 1. Got keyboard polling driver to work.
-1. Setup idt and successfully tested it with a test interrupt.
+1. Setup interrupts
+1. Get memory map with BIOS interrupts
 
 ## Compilation
 
