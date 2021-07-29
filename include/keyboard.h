@@ -89,7 +89,7 @@ typedef struct keyboard_input {
 extern keyboard_input_t keyboard_input;
 
 void init_keyboard();
-void keyboard_irq_handler(struct registers *);
+void keyboard_irq_handler();
 void send_command(u8 command);
 u8 get_scancode();
 u8 get_key(u8 type_specifying_and_val);

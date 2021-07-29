@@ -247,7 +247,7 @@ MEM_INFO_ERR_MSG: db "Failed to get memory info", 0xd, 0xa, 0x0
 smap_magic_num equ 0x0534D4150
 mem_map_entry_count equ 0x8000
 mem_map_start equ mem_map_entry_count + 4 ; place it after the 4 bytes for the count variable
-mem_map_entry_size equ 0x20 ; 2 uint64_ts (base and len) and 1 uint32_t (type)
+mem_map_entry_size equ 20 ; 2 uint64_ts (base and len) and 1 uint32_t (type)
 
 ; parameters for reading from disk
 drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)

@@ -3,7 +3,7 @@
 #include <util.h> // for int_to_ascii
 #include <ports_io.h>
 
-void (*irq_handlers[16])(struct registers *) = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+void (*irq_handlers[16])() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void pic_setup_with_irq_remap()
 {
@@ -39,11 +39,11 @@ void pic_setup_with_irq_remap()
 
 void irq_handler(struct registers regs)
 {
-  void (*handler)(struct registers*);
+  void (*handler)();
   handler = irq_handlers[regs.int_no - FIRST_IRQ];
 
   if (handler)
-    handler(&regs);
+    handler();
 
   // Send End Of Interrupt to master (and maybe slave) PIC
   if (regs.int_no >= FIRST_IRQ+8) // check if IRQ is from the Slave PIC (IRQ 8-15)
@@ -52,7 +52,7 @@ void irq_handler(struct registers regs)
   port_byte_out(PIC1_COMMAND, PIC_EOI_COMMAND); // send EOI to Master PIC
 }
 
-void install_irq_handler(int irq_num, void (*handler)(struct registers *))
+void install_irq_handler(int irq_num, void (*handler)())
 {
   irq_handlers[irq_num] = handler;
 }

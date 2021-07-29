@@ -38,18 +38,22 @@ u32 get_kernel_end()
 void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
 {
   char kernel_end_string[5];
-  int_to_ascii(get_kernel_end(), kernel_end_string);
+  int_to_hexascii(get_kernel_end(), kernel_end_string);
   kprint_at(kernel_end_string, 3, 21, WHITE);
 
   char mmap_string[5];
   int i;
   for (i = 0; i < mem_map_entry_count; i++) {
-    int_to_ascii(mem_map[i].base_addr, mmap_string);
-    kprint_at(mmap_string, i, i*2, WHITE);
-    int_to_ascii(mem_map[i].length, mmap_string);
-    kprint_at(mmap_string, i, i*2+1, WHITE);
-    int_to_ascii(mem_map[i].type, mmap_string);
-    kprint_at(mmap_string, i, i*2+2, WHITE);
+    memset(mmap_string, 0, 5);
+    int_to_hexascii(mem_map[i].base_addr, mmap_string);
+    kprint_at(mmap_string, i*2, i*3, WHITE);
+    memset(mmap_string, 0, 5);
+    int_to_hexascii(mem_map[i].length, mmap_string);
+    kprint_at(mmap_string, i*2, i*3+1, WHITE);
+    memset(mmap_string, 0, 5);
+    //int_to_hexascii(0b10000000000000000100000000000000, mmap_string);
+    int_to_hexascii(mem_map[i].type, mmap_string);
+    kprint_at(mmap_string, i*2, i*3+2, WHITE);
   }
 
   while(1);

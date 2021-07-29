@@ -40,7 +40,7 @@ void init_keyboard()
  * That's why then this function can read the keyboard output buffer
  * immediately without checking whether it is full
  */
-void keyboard_irq_handler(struct registers *regs)
+void keyboard_irq_handler()
 {
   u8 scancode = port_byte_in(0x60);
   keyboard_input.is_key_pressed = IS_KEY_DOWN(scancode);

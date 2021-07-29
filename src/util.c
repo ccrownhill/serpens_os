@@ -1,4 +1,5 @@
 #include <util.h>
+#include <types.h>
 
 /**
  * int_to_ascii: convert n to characters in s
@@ -15,6 +16,22 @@ void int_to_ascii(int n, char s[])
   } while ((n /= 10) > 0);  // delete it
   if (sign < 0)
     s[i++] = '-';
+  s[i] = '\0';
+  reverse(s);
+}
+
+void int_to_hexascii(int n, char s[])
+{
+  int last_digit;
+  //n = -n; // for testing
+  int i = 0;
+  do {      // generate digits in reverse order
+    last_digit = n % 16;
+    if (last_digit < 0xa)
+      s[i++] = last_digit + '0';
+    else
+      s[i++] = last_digit - 0xa + 'A';
+  } while ((n /= 16) > 0);  // delete it
   s[i] = '\0';
   reverse(s);
 }
