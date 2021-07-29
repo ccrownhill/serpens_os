@@ -22,16 +22,29 @@ entry:
 
 ; get a memory map using int 0x15 with EAX=0xe820
 mem_info:
-  xor bx, bx ; es can't be set directly
-  mov es, bx ; so set it to 0 using bx
+  xor bp, bp ; use bp as counter of memory map entries that were read
+  mov eax, 0xe820 ; the memory map function of int 0x15
+  xor ebx, ebx ; ebx 0 to start at beginning of map
+  mov es, bx ; set es (the segment selector of the buffer address es:di) to 0
   mov di, mem_map_start ; make es:di point to memory at address "mem_map_start"
+  mov edx, smap_magic_num ; magic number ("SMAP" in ascii)
+  mov ecx, mem_map_entry_size
+  int 0x15
 
-  jmp mem_info_err
+  jc mem_info_err ; carry flag is set on error
+  mov edx, smap_magic_num ; sometimes it does not persist in edx
+  cmp eax, edx ; on success eax should be set to SMAP
+  jne mem_info_err
+  cmp ebx, 0 ; this means that all entries were read
+  je mem_info_aquisition_done
+  jmp disk_error ; just test if there was no memory info aquisition error
 
 mem_info_err:
   mov si, MEM_INFO_ERR_MSG
   call print
   jmp $ ; hang forever
+
+mem_info_aquisition_done:
 
 chs_disk_info:
   ; get info about disk parameters like maximum number of tracks, heads, cylinders
@@ -220,8 +233,10 @@ DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
 MEM_INFO_ERR_MSG: db "Failed to get memory info", 0xd, 0xa, 0x0
 
 ; store entry count at this address after the bootsector and before the kernel
+smap_magic_num equ 0x0534D4150
 mem_map_entry_count equ 0x8000
 mem_map_start equ mem_map_entry_count + 4 ; place it after the 4 bytes for the count variable
+mem_map_entry_size equ 0x20 ; 2 uint64_ts (base and len) and 1 uint32_t (type)
 
 ; parameters for reading from disk
 drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
