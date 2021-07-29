@@ -12,7 +12,6 @@ entry:
   mov ds, ax
 
   ; init stack by setting stack pointer to some empty memory region
-  ; See where it is empty: https://wiki.osdev.org/Memory_Map_(x86)
   mov sp, 0x3000
   mov bp, sp ; init base pointer
 
@@ -20,6 +19,19 @@ entry:
   mov ah, 0x0
   mov al, 0x3
   int 0x10
+
+; get a memory map using int 0x15 with EAX=0xe820
+mem_info:
+  xor bx, bx ; es can't be set directly
+  mov es, bx ; so set it to 0 using bx
+  mov di, mem_map_start ; make es:di point to memory at address "mem_map_start"
+
+  jmp mem_info_err
+
+mem_info_err:
+  mov si, MEM_INFO_ERR_MSG
+  call print
+  jmp $ ; hang forever
 
 chs_disk_info:
   ; get info about disk parameters like maximum number of tracks, heads, cylinders
@@ -205,6 +217,11 @@ disk_error:
 greetings: db "Tic-Tac-Toe Time!!!", 0xd, 0xa, 0x0 ; 0xd is \r and 0xa is \n
 hexdigits: db "0123456789ABCDEF" ; used for printing hex values
 DISK_ERR_MSG: db "Error reading from disk", 0xd, 0xa, 0x0
+MEM_INFO_ERR_MSG: db "Failed to get memory info", 0xd, 0xa, 0x0
+
+; store entry count at this address after the bootsector and before the kernel
+mem_map_entry_count equ 0x8000
+mem_map_start equ mem_map_entry_count + 4 ; place it after the 4 bytes for the count variable
 
 ; parameters for reading from disk
 drive_num equ 0x80 ; boot drive: 0x80 for first Hard disk (0x0 for first floppy not working)
