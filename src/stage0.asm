@@ -21,30 +21,35 @@ entry:
   int 0x10
 
 ; get a memory map using int 0x15 with EAX=0xe820
-mem_info:
+mem_map_acquisition:
   xor bp, bp ; use bp as counter of memory map entries that were read
-  mov eax, 0xe820 ; the memory map function of int 0x15
   xor ebx, ebx ; ebx 0 to start at beginning of map
   mov es, bx ; set es (the segment selector of the buffer address es:di) to 0
   mov di, mem_map_start ; make es:di point to memory at address "mem_map_start"
   mov edx, smap_magic_num ; magic number ("SMAP" in ascii)
+read_next_mem_map_entry:
+  mov eax, 0xe820 ; the memory map function of int 0x15
   mov ecx, mem_map_entry_size
   int 0x15
 
-  jc mem_info_err ; carry flag is set on error
+  inc bp ; increment entry counter
+  jc mem_map_acquisition_err ; carry flag is set on error
   mov edx, smap_magic_num ; sometimes it does not persist in edx
   cmp eax, edx ; on success eax should be set to SMAP
-  jne mem_info_err
+  jne mem_map_acquisition_err
   cmp ebx, 0 ; this means that all entries were read
-  je mem_info_aquisition_done
-  jmp disk_error ; just test if there was no memory info aquisition error
+  je mem_map_acquisition_done
 
-mem_info_err:
+  add di, mem_map_entry_size ; make di point to next entry location
+  jmp read_next_mem_map_entry ; read next entry
+
+mem_map_acquisition_err:
   mov si, MEM_INFO_ERR_MSG
   call print
   jmp $ ; hang forever
 
-mem_info_aquisition_done:
+mem_map_acquisition_done:
+  mov [mem_map_entry_count], bp ; store entry count in memory to pass it to kernel later
 
 chs_disk_info:
   ; get info about disk parameters like maximum number of tracks, heads, cylinders
@@ -169,6 +174,12 @@ pm_entry:
   mov ss, ax
 
   mov esp, 0x3000
+
+  ; note that the start of the memory map is just 4 bytes after mem_map_entry_count
+  ; before calling the kernel main function in the bootstrap assembly of the kernel
+  ; this should be pushed so that the kernel main function can read it as its
+  ; parameter
+  mov ebx, mem_map_entry_count
 
   ; continue execution in kernel with jump
   jmp 0x10000 ; this address was set to 0x1000:0x0 when loading the kernel from disk

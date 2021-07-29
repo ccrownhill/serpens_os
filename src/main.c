@@ -17,6 +17,12 @@
 // in link.ld
 extern u32 _kernelend;
 
+typedef struct {
+  u64 base_addr;
+  u64 length;
+  u32 type;
+} mem_map_entry_t;
+
 void start_screen()
 {
   clear_screen();
@@ -29,11 +35,22 @@ u32 get_kernel_end()
   return (u32)&_kernelend;
 }
 
-void main()
+void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
 {
   char kernel_end_string[5];
   int_to_ascii(get_kernel_end(), kernel_end_string);
   kprint_at(kernel_end_string, 3, 21, WHITE);
+
+  char mmap_string[5];
+  int i;
+  for (i = 0; i < mem_map_entry_count; i++) {
+    int_to_ascii(mem_map[i].base_addr, mmap_string);
+    kprint_at(mmap_string, i, i*2, WHITE);
+    int_to_ascii(mem_map[i].length, mmap_string);
+    kprint_at(mmap_string, i, i*2+1, WHITE);
+    int_to_ascii(mem_map[i].type, mmap_string);
+    kprint_at(mmap_string, i, i*2+2, WHITE);
+  }
 
   while(1);
 
