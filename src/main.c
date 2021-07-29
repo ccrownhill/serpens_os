@@ -8,6 +8,7 @@
 #include <util.h>
 #include <idt.h>
 #include <irq.h>
+#include <memory.h>
 
 #define START_SCREEN_TITLE "Snake Operating System"
 #define START_SCREEN_TITLE_LEN 22
@@ -16,12 +17,6 @@
 
 // in link.ld
 extern u32 _kernelend;
-
-typedef struct {
-  u64 base_addr;
-  u64 length;
-  u32 type;
-} mem_map_entry_t;
 
 void start_screen()
 {
@@ -41,17 +36,16 @@ void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
   int_to_hexascii(get_kernel_end(), kernel_end_string);
   kprint_at(kernel_end_string, 3, 21, WHITE);
 
-  char mmap_string[5];
+  char mmap_string[15];
   int i;
   for (i = 0; i < mem_map_entry_count; i++) {
-    memset(mmap_string, 0, 5);
+    memset(mmap_string, 0, 15);
     int_to_hexascii(mem_map[i].base_addr, mmap_string);
     kprint_at(mmap_string, i*2, i*3, WHITE);
-    memset(mmap_string, 0, 5);
+    memset(mmap_string, 0, 15);
     int_to_hexascii(mem_map[i].length, mmap_string);
     kprint_at(mmap_string, i*2, i*3+1, WHITE);
-    memset(mmap_string, 0, 5);
-    //int_to_hexascii(0b10000000000000000100000000000000, mmap_string);
+    memset(mmap_string, 0, 15);
     int_to_hexascii(mem_map[i].type, mmap_string);
     kprint_at(mmap_string, i*2, i*3+2, WHITE);
   }

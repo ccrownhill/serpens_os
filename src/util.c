@@ -20,9 +20,12 @@ void int_to_ascii(int n, char s[])
   reverse(s);
 }
 
-void int_to_hexascii(int n, char s[])
+/**
+ * u64 number so that all addresses will fit into it
+ */
+void int_to_hexascii(u64 n, char s[])
 {
-  int last_digit;
+  u64 last_digit;
   //n = -n; // for testing
   int i = 0;
   do {      // generate digits in reverse order

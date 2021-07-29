@@ -4,7 +4,7 @@
 #include <types.h>
 
 void int_to_ascii(int n, char s[]);
-void int_to_hexascii(int n, char s[]);
+void int_to_hexascii(u64 n, char s[]);
 void reverse(char s[]);
 int strlen(char s[]);
 void memset(u8* dest, u8 val, u32 len);
