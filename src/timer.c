@@ -5,6 +5,7 @@
 
 #include <timer.h>
 #include <irq.h>
+#include <ports_io.h>
 
 // in main.c
 void game_main_loop();

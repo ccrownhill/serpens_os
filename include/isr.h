@@ -10,12 +10,12 @@
  * data can be accessed by isr_handler
  */
 struct registers {
-  u32 ds;               // data segment selector
+  u32 gs, fs, es, ds;               // data segment selector
   u32 edi, esi, ebp, esp, ebx, edx, ecx, eax; // pusehd by pusha
   u32 int_no, err_code; // Interrupt number and error code from isr[n] fn
   u32 eip, cs, eflags, useresp, ss; // pushed by processor automatically
 };
 
-void isr_exception_handler(struct registers);
+void isr_exception_handler(struct registers*);
 
 #endif

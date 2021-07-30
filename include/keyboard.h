@@ -4,7 +4,6 @@
 #include <types.h>
 #include <isr.h> // for `struct registers`
 
-// copied from jdah/tetris-os -> keyboard.h
 // maybe not perfectly correct
 #define KEY_NULL 0
 #define KEY_ESC 27
@@ -76,17 +75,9 @@
     }\
   })
  
-typedef struct keyboard_input {
-  u8 is_key_down; // true or false value whether any key is pressed
-
-  // the keycode of the pressed key
-  // (the ASCII code for all alphabetical keys and the defined scancode values
-  // from above for all other keys)
-  u8 key_code;
-} keyboard_input_t;
-
-// defined in keyboard.c
-extern keyboard_input_t keyboard_input;
+// the ASCII code for all alphabetical keys and the defined scancode values
+// from above for all other keys
+extern u8 key_down_code;
 
 void init_keyboard();
 void keyboard_irq_handler();

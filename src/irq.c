@@ -37,16 +37,16 @@ void pic_setup_with_irq_remap()
   port_byte_out(PIC2_DATA, mask2);
 }
 
-void irq_handler(struct registers regs)
+void irq_handler(struct registers* regs)
 {
   void (*handler)();
-  handler = irq_handlers[regs.int_no - FIRST_IRQ];
+  handler = irq_handlers[regs->int_no - FIRST_IRQ];
 
   if (handler)
     handler();
 
   // Send End Of Interrupt to master (and maybe slave) PIC
-  if (regs.int_no >= FIRST_IRQ+8) // check if IRQ is from the Slave PIC (IRQ 8-15)
+  if (regs->int_no >= FIRST_IRQ+8) // check if IRQ is from the Slave PIC (IRQ 8-15)
     port_byte_out(PIC2_COMMAND, PIC_EOI_COMMAND); // send EOI to Slave PIC
 
   port_byte_out(PIC1_COMMAND, PIC_EOI_COMMAND); // send EOI to Master PIC

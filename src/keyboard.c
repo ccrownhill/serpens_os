@@ -19,7 +19,7 @@ u8 scancode_set1_chars[128] = {
   KEY_PAGE_DOWN, KEY_INSERT, KEY_DELETE, 0, 0, 0, KEY_F11, KEY_F12
 };
 
-keyboard_input_t keyboard_input;
+u8 key_down_code = 0;
 
 void init_keyboard()
 {
@@ -29,6 +29,8 @@ void init_keyboard()
   // clear the keyboard output buffer as long as it is not empty
   // (i.e. the first bit of the 0x64 status register is set)
   CLEAR_KEYBOARD_OUT_BUF();
+
+  key_down_code = 0;
 
   // install keyboard IRQ handler on IRQ1
   install_irq_handler(KEYBOARD_IRQ, keyboard_irq_handler);
@@ -42,9 +44,14 @@ void init_keyboard()
  */
 void keyboard_irq_handler()
 {
+  kprint("key");
   u8 scancode = port_byte_in(0x60);
-  keyboard_input.is_key_down = IS_KEY_DOWN(scancode);
-  keyboard_input.key_code = scancode_set1_chars[scancode & 0x7f];
+  if (IS_KEY_UP(scancode)) {
+    if (key_down_code == scancode) // no key currently pressed
+      key_down_code = 0;
+  } else {
+    key_down_code = scancode;
+  }
 }
 
 void send_command(u8 command)

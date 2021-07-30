@@ -1,9 +1,12 @@
 #include <game_ui.h>
 #include <display.h>
 #include <util.h>
+#include <keyboard.h>
 #include <snake.h> // for score extern declaration (if this will be the only thing needed remove this include statement later)
 
 #define BORDER_CHAR 177 // this uses code page 437 encoding
+
+extern int is_game_running; // in main.c
 
 static void draw_field_borders()
 {
@@ -16,6 +19,43 @@ static void draw_field_borders()
     print_char(BORDER_CHAR, FIELD_X_OFFSET, FIELD_Y_OFFSET + i, LIGHT_BLUE); // left border
     print_char(BORDER_CHAR, FIELD_X_OFFSET + FIELD_COLS+1, FIELD_Y_OFFSET + i, LIGHT_BLUE); // right border
   }
+}
+
+void start_screen()
+{
+  clear_screen();
+  kprint_centered(START_SCREEN_TITLE, START_SCREEN_TITLE_LEN, 38, 11, WHITE);
+  kprint_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
+
+  // wait for key press
+  while (!key_down_code);
+
+  start_game();
+}
+
+// TODO: Make the computer poweroff if ESC was pressed
+void game_over_screen()
+{
+  is_game_running = 0;
+  key_down_code = 0; // remove all previously encountered keys
+  clear_screen();
+  show_score();
+  kprint_centered(GAME_OVER_SCREEN_TITLE, GAME_OVER_SCREEN_TITLE_LEN, 38, 11, WHITE);
+  kprint_centered(GAME_OVER_SCREEN_SUBTITLE, GAME_OVER_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
+
+  // wait for key press
+  while (!key_down_code);
+
+  start_game();
+}
+
+void start_game()
+{
+  score = 0;
+  clear_screen();
+  init_snake_ui();
+  init_snake();
+  is_game_running = 1;
 }
 
 static void init_info_text()
@@ -48,8 +88,19 @@ void show_score()
 
 void init_snake_ui()
 {
-  clear_screen();
   draw_field_borders();
   init_info_text();
   show_score();
+}
+
+/**
+ * Just make all fields of the snake playing field black again
+ * this will be used at the beginning of every frame
+ */
+void redraw_background()
+{
+  int col, row;
+  for (col = FIELD_X_OFFSET+1; col < FIELD_X_OFFSET + FIELD_COLS + 1; col++)
+    for (row = FIELD_Y_OFFSET+1; row < FIELD_Y_OFFSET + FIELD_ROWS + 1; row++)
+      print_char('\0', col, row, BLACK);
 }

@@ -264,7 +264,7 @@ sectors_per_track: db 0x0
 max_head_num: db 0x0
 max_cylinder_num: dw 0x0
 
-total_sectors_num equ 0x20
+total_sectors_num equ 0x25
 sector_size equ 512 ; in bytes
 sectors_read: db 0
 

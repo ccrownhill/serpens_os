@@ -5,8 +5,8 @@
 #include <display.h> // for the colors
 
 // place snake in the center
-#define SNAKE_INIT_X (FIELD_X_OFFSET + (FIELD_COLS / 2))
-#define SNAKE_INIT_Y (FIELD_Y_OFFSET + (FIELD_ROWS / 2))
+#define SNAKE_INIT_X (FIELD_X_OFFSET + (FIELD_COLS / 2) + 1)
+#define SNAKE_INIT_Y (FIELD_Y_OFFSET + (FIELD_ROWS / 2) + 1)
 
 #define SNAKE_HEAD_CHAR 2 // smiley in Code Page 437
 #define SNAKE_BODY_CHAR 15 // sun character
@@ -25,6 +25,7 @@ typedef struct snake_part {
 void init_snake();
 void move_snake();
 void draw_snake();
-void detect_boder_collisions();
+void destroy_snake();
+void detect_border_collisions();
 
 #endif
