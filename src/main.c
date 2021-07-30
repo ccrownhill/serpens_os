@@ -15,9 +15,6 @@
 #define START_SCREEN_SUBTITLE "Press any key to begin playing"
 #define START_SCREEN_SUBTITLE_LEN 30
 
-// in link.ld
-extern u32 _kernelend;
-
 void start_screen()
 {
   clear_screen();
@@ -25,33 +22,9 @@ void start_screen()
   kprint_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 }
 
-u32 get_kernel_end()
-{
-  return (u32)&_kernelend;
-}
-
 void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
 {
-  char kernel_end_string[5];
-  int_to_hexascii(get_kernel_end(), kernel_end_string);
-  kprint_at(kernel_end_string, 3, 21, WHITE);
-
-  char mmap_string[15];
-  int i;
-  for (i = 0; i < mem_map_entry_count; i++) {
-    memset(mmap_string, 0, 15);
-    int_to_hexascii(mem_map[i].base_addr, mmap_string);
-    kprint_at(mmap_string, i*2, i*3, WHITE);
-    memset(mmap_string, 0, 15);
-    int_to_hexascii(mem_map[i].length, mmap_string);
-    kprint_at(mmap_string, i*2, i*3+1, WHITE);
-    memset(mmap_string, 0, 15);
-    int_to_hexascii(mem_map[i].type, mmap_string);
-    kprint_at(mmap_string, i*2, i*3+2, WHITE);
-  }
-
-  while(1);
-
+  init_mem_management(mem_map_entry_count, mem_map);
 
   init_idt();
   pic_setup_with_irq_remap();

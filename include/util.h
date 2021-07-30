@@ -3,6 +3,7 @@
 
 #include <types.h>
 
+void fatal(char*);
 void int_to_ascii(int n, char s[]);
 void int_to_hexascii(u64 n, char s[]);
 void reverse(char s[]);

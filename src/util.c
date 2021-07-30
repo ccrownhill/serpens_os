@@ -1,5 +1,16 @@
 #include <util.h>
 #include <types.h>
+#include <display.h> // for "fatal"
+
+/**
+ * This function just prints a red error message in the lower left screen corner
+ * and loops forever
+ */
+void fatal(char* msg)
+{
+  kprint_at(msg, 0, 24, LIGHT_RED);
+  while(1);
+}
 
 /**
  * int_to_ascii: convert n to characters in s
