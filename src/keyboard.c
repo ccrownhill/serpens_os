@@ -43,7 +43,7 @@ void init_keyboard()
 void keyboard_irq_handler()
 {
   u8 scancode = port_byte_in(0x60);
-  keyboard_input.is_key_pressed = IS_KEY_DOWN(scancode);
+  keyboard_input.is_key_down = IS_KEY_DOWN(scancode);
   keyboard_input.key_code = scancode_set1_chars[scancode & 0x7f];
 }
 

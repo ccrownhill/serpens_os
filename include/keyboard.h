@@ -77,7 +77,7 @@
   })
  
 typedef struct keyboard_input {
-  u8 is_key_pressed; // true or false value whether any key is pressed
+  u8 is_key_down; // true or false value whether any key is pressed
 
   // the keycode of the pressed key
   // (the ASCII code for all alphabetical keys and the defined scancode values

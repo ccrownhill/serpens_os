@@ -13,7 +13,7 @@ snake_part* snake_rear;
 
 void init_snake()
 {
-  //snake_head = (snake_part*)malloc(sizeof(snake_part)); MALLOC NOT IMPLEMENTED YET
+  snake_head = (snake_part*)kalloc(sizeof(snake_part));
   snake_head->x_pos = SNAKE_INIT_X;
   snake_head->y_pos = SNAKE_INIT_Y;
   snake_head->next = NULL;
@@ -31,7 +31,7 @@ void move_snake()
   }
 
   // move the snake head according to user input
-  if (keyboard_input.is_key_pressed) {
+  if (keyboard_input.is_key_down) {
     switch (keyboard_input.key_code) {
       case KEY_LEFT:
         snake_head->x_pos -= 1;
