@@ -61,8 +61,7 @@
  * if the resulting number of this and operation is non zero
  * the condition expressed by the Macro name is correct
  */
-#define ANY_CHECK_AND_VAL 0xff
-#define IS_KEY_UP(scancode) (scancode & 0x80)
+#define IS_KEY_UP(scancode) ((scancode) & 0x80)
 #define IS_KEY_DOWN(scancode) (!IS_KEY_UP(scancode))
 
 /**

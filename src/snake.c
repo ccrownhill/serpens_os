@@ -4,7 +4,7 @@
 #include <game_ui.h> // definitions of game field border coordinates
 #include <memory.h>
 
-typedef enum { LEFT, RIGHT, UP, DOWN } moving_dir;
+typedef enum { NONE, LEFT, RIGHT, UP, DOWN } moving_dir;
 
 extern int is_game_running; // in main.c
 
@@ -22,6 +22,7 @@ void init_snake()
   snake_head->y_pos = SNAKE_INIT_Y;
   snake_head->next = NULL;
   snake_rear = snake_head;
+  snake_dir = NONE;
 }
 
 void move_snake()
@@ -53,24 +54,29 @@ void move_snake()
       snake_dir = DOWN;
       break;
     default: // if no key was pressed (or no arrow key)
-      switch (snake_dir) { // just continue moving in the same direction
-        case LEFT:
-          snake_head->x_pos -= 1;
-          break;
-        case RIGHT:
-          snake_head->x_pos += 1;
-          break;
-        case UP:
-          snake_head->y_pos -= 1;
-          break;
-        case DOWN:
-          snake_head->y_pos += 1;
-          break;
-      }
+      continue_moving_in_current_dir(); 
       break;
   }
 
   detect_border_collisions();
+}
+
+void continue_moving_in_current_dir()
+{
+  switch (snake_dir) { // just continue moving in the same direction
+    case LEFT:
+      snake_head->x_pos -= 1;
+      break;
+    case RIGHT:
+      snake_head->x_pos += 1;
+      break;
+    case UP:
+      snake_head->y_pos -= 1;
+      break;
+    case DOWN:
+      snake_head->y_pos += 1;
+      break;
+  }
 }
 
 void draw_snake()

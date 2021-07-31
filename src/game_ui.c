@@ -37,16 +37,16 @@ void start_screen()
 void game_over_screen()
 {
   is_game_running = 0;
-  key_down_code = 0; // remove all previously encountered keys
+  //key_down_code = 0; // remove all previously encountered keys
   clear_screen();
   show_score();
   kprint_centered(GAME_OVER_SCREEN_TITLE, GAME_OVER_SCREEN_TITLE_LEN, 38, 11, WHITE);
   kprint_centered(GAME_OVER_SCREEN_SUBTITLE, GAME_OVER_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
   // wait for key press
-  //while (!key_down_code);
+  while (!key_down_code);
   
-  get_scancode();
+  //get_scancode();
 
   start_game();
 }

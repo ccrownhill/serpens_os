@@ -24,6 +24,7 @@ typedef struct snake_part {
 
 void init_snake();
 void move_snake();
+void continue_moving_in_currrent_dir();
 void draw_snake();
 void destroy_snake();
 void detect_border_collisions();

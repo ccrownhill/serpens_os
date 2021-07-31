@@ -44,12 +44,17 @@ void init_keyboard()
  */
 void keyboard_irq_handler()
 {
-  kprint("key");
   u8 scancode = port_byte_in(0x60);
+#include <util.h> // for testing only
+  char test[5];
+  int_to_hexascii((u64)scancode, test);
+  kprint_at(test, 0, 24, RED);
   if (IS_KEY_UP(scancode)) {
+    kprint("up");
     if (key_down_code == scancode) // no key currently pressed
       key_down_code = 0;
   } else {
+    kprint("down");
     key_down_code = scancode;
   }
 }
