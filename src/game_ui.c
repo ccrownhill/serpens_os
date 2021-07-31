@@ -44,7 +44,9 @@ void game_over_screen()
   kprint_centered(GAME_OVER_SCREEN_SUBTITLE, GAME_OVER_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
   // wait for key press
-  while (!key_down_code);
+  //while (!key_down_code);
+  
+  get_scancode();
 
   start_game();
 }

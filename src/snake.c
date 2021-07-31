@@ -35,41 +35,40 @@ void move_snake()
   }
 
   // move the snake head according to user input
-  if (key_down_code) {
-    switch (key_down_code) {
-      case KEY_LEFT:
-        snake_head->x_pos -= 1;
-        snake_dir = LEFT;
-        break;
-      case KEY_RIGHT:
-        snake_head->x_pos += 1;
-        snake_dir = RIGHT;
-        break;
-      case KEY_UP:
-        snake_head->y_pos -= 1;
-        snake_dir = UP;
-        break;
-      case KEY_DOWN:
-        snake_head->y_pos += 1;
-        snake_dir = DOWN;
-        break;
-    }
-  } else { // if there is no new user input
-    switch (snake_dir) { // just continue moving in the same direction
-      case LEFT:
-        snake_head->x_pos -= 1;
-        break;
-      case RIGHT:
-        snake_head->x_pos += 1;
-        break;
-      case UP:
-        snake_head->y_pos -= 1;
-        break;
-      case DOWN:
-        snake_head->y_pos += 1;
-        break;
-    } // end switch
-  } // end if
+  switch (key_down_code) {
+    case KEY_LEFT:
+      snake_head->x_pos -= 1;
+      snake_dir = LEFT;
+      break;
+    case KEY_RIGHT:
+      snake_head->x_pos += 1;
+      snake_dir = RIGHT;
+      break;
+    case KEY_UP:
+      snake_head->y_pos -= 1;
+      snake_dir = UP;
+      break;
+    case KEY_DOWN:
+      snake_head->y_pos += 1;
+      snake_dir = DOWN;
+      break;
+    default: // if no key was pressed (or no arrow key)
+      switch (snake_dir) { // just continue moving in the same direction
+        case LEFT:
+          snake_head->x_pos -= 1;
+          break;
+        case RIGHT:
+          snake_head->x_pos += 1;
+          break;
+        case UP:
+          snake_head->y_pos -= 1;
+          break;
+        case DOWN:
+          snake_head->y_pos += 1;
+          break;
+      }
+      break;
+  }
 
   detect_border_collisions();
 }
