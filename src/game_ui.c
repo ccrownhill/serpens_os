@@ -29,7 +29,7 @@ void start_screen()
   kprint_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
   key_down_code = 0; // ignore all previous key presses
-  get_key_up();
+  wait_for_key_release();
   //key_up_code = 0; // ignore all previous key releases
   //while (!key_up_code);
   key_up_code = 0; // clear code of key release just detected
@@ -56,7 +56,7 @@ void game_over_screen()
   //kprint_at(test, 6, 20, GREEN);
 
   key_down_code = 0; // ignore all previous key presses
-  get_key_up();
+  wait_for_key_release();
   //key_up_code = 0; // ignore all previous key releases
   //while (!key_up_code);
   key_up_code = 0; // clear code of key release just detected

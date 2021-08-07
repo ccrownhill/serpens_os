@@ -64,7 +64,7 @@ void keyboard_irq_handler()
   // it will also qualify the 0xe0 prefix for example (sent before arrow keys for example)
   // as a key release even though it isn't
   // To really check for a key release first wait for a key press as done in
-  // the "get_key_up" function
+  // the "wait_for_key_release()" function
   if (IS_KEY_UP(scancode)) {
     kprint("up");
     key_down_code = 0;
@@ -75,20 +75,13 @@ void keyboard_irq_handler()
   }
 }
 
-/**
- * Wait until any key was released
- * if this is the case return its scancode
- */
-u8 get_key_up()
+void wait_for_key_release()
 {
-  u8 ret_scancode;
   kprint("start");
   while(!key_down_code); // wait until a key was pressed
   kprint("down");
-  while(key_down_code) // wait until key was released
-    ret_scancode = key_down_code; // update scancode to currently pressed key
+  while(key_down_code); // wait until key was released
   kprint("up");
-  return ret_scancode;
 }
 
 void send_command(u8 command)

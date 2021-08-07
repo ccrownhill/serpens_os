@@ -87,6 +87,7 @@ extern u8 key_up_code;
 
 void init_keyboard();
 void keyboard_irq_handler();
+void wait_for_key_release();
 void send_command(u8 command);
 u8 get_scancode();
 u8 get_key(u8 type_specifying_and_val);
