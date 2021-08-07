@@ -20,6 +20,9 @@
 #define FIELD_X_OFFSET 5
 #define FIELD_Y_OFFSET 0
 
+#define SCORE_COL 70
+#define SCORE_ROW 9
+
 void start_screen();
 void game_over_screen();
 void start_game();

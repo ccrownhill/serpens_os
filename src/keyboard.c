@@ -20,6 +20,7 @@ u8 scancode_set1_chars[128] = {
 };
 
 u8 key_down_code = 0;
+u8 key_up_code = 0;
 
 void init_keyboard()
 {
@@ -31,6 +32,7 @@ void init_keyboard()
   CLEAR_KEYBOARD_OUT_BUF();
 
   key_down_code = 0;
+  key_up_code = 0;
 
   // install keyboard IRQ handler on IRQ1
   install_irq_handler(KEYBOARD_IRQ, keyboard_irq_handler);
@@ -45,18 +47,48 @@ void init_keyboard()
 void keyboard_irq_handler()
 {
   u8 scancode = port_byte_in(0x60);
+  u8 scancode_adder = 0; // if the keyboard sends a multiple byte scancode
 #include <util.h> // for testing only
   char test[5];
   int_to_hexascii((u64)scancode, test);
   kprint_at(test, 0, 24, RED);
+
+  // this 0xe0 checking stuff is only needed for getting correct arrow key input
+  //if (scancode == 0xe0) { // the 0xe0 byte comes for example before arrow keys
+  //  while (!(port_byte_in(0x64) & 0x1)); // wait for full output buffer
+  //  scancode = port_byte_in(0x60);
+  //  scancode_adder = E0_ADDER;
+  //}
+
+  // NOTE: Be careful with the IS_KEY_UP check because
+  // it will also qualify the 0xe0 prefix for example (sent before arrow keys for example)
+  // as a key release even though it isn't
+  // To really check for a key release first wait for a key press as done in
+  // the "get_key_up" function
   if (IS_KEY_UP(scancode)) {
     kprint("up");
-    if (key_down_code == scancode) // no key currently pressed
-      key_down_code = 0;
+    key_down_code = 0;
+    key_up_code = scancode & 0x7f; // only use lower 7 bits
   } else {
     kprint("down");
-    key_down_code = scancode;
+    key_down_code = scancode + scancode_adder;
   }
+}
+
+/**
+ * Wait until any key was released
+ * if this is the case return its scancode
+ */
+u8 get_key_up()
+{
+  u8 ret_scancode;
+  kprint("start");
+  while(!key_down_code); // wait until a key was pressed
+  kprint("down");
+  while(key_down_code) // wait until key was released
+    ret_scancode = key_down_code; // update scancode to currently pressed key
+  kprint("up");
+  return ret_scancode;
 }
 
 void send_command(u8 command)

@@ -23,12 +23,16 @@ static void draw_field_borders()
 
 void start_screen()
 {
+  is_game_running = 0;
   clear_screen();
   kprint_centered(START_SCREEN_TITLE, START_SCREEN_TITLE_LEN, 38, 11, WHITE);
   kprint_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
-  // wait for key press
-  while (!key_down_code);
+  key_down_code = 0; // ignore all previous key presses
+  get_key_up();
+  //key_up_code = 0; // ignore all previous key releases
+  //while (!key_up_code);
+  key_up_code = 0; // clear code of key release just detected
 
   start_game();
 }
@@ -37,23 +41,33 @@ void start_screen()
 void game_over_screen()
 {
   is_game_running = 0;
-  //key_down_code = 0; // remove all previously encountered keys
   clear_screen();
   show_score();
   kprint_centered(GAME_OVER_SCREEN_TITLE, GAME_OVER_SCREEN_TITLE_LEN, 38, 11, WHITE);
   kprint_centered(GAME_OVER_SCREEN_SUBTITLE, GAME_OVER_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
-  // wait for key press
-  while (!key_down_code);
-  
-  //get_scancode();
+  // get scancodes and print them for testing
+  //char test[5];
+  //u8 test_code = get_scancode();
+  //int_to_hexascii(test_code, test);
+  //kprint_at(test, 0, 20, GREEN);
+  //test_code = get_scancode();
+  //int_to_hexascii(test_code, test);
+  //kprint_at(test, 6, 20, GREEN);
 
+  key_down_code = 0; // ignore all previous key presses
+  get_key_up();
+  //key_up_code = 0; // ignore all previous key releases
+  //while (!key_up_code);
+  key_up_code = 0; // clear code of key release just detected
+  
   start_game();
 }
 
 void start_game()
 {
   score = 0;
+  key_down_code = 0; // prevent previous arrow key presses to make snake start moving
   clear_screen();
   init_snake_ui();
   init_snake();
@@ -85,7 +99,7 @@ void show_score()
     i++;
   } while ((n /= 10) > 0);
 
-  kprint_centered(score_text, 11, 70, 9, WHITE);
+  kprint_centered(score_text, 11, SCORE_COL, SCORE_ROW, WHITE);
 }
 
 void init_snake_ui()

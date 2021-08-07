@@ -25,42 +25,6 @@ void init_snake()
   snake_dir = NONE;
 }
 
-void move_snake()
-{
-  // advance all body parts to the position of the next body part
-  snake_part* snake_p;
-  // NOTE: rear parts always point to next part closer to head
-  for (snake_p = snake_rear; snake_p->next != NULL; snake_p = snake_p->next) {
-    snake_p->x_pos = snake_p->next->x_pos;
-    snake_p->y_pos = snake_p->next->y_pos;
-  }
-
-  // move the snake head according to user input
-  switch (key_down_code) {
-    case KEY_LEFT:
-      snake_head->x_pos -= 1;
-      snake_dir = LEFT;
-      break;
-    case KEY_RIGHT:
-      snake_head->x_pos += 1;
-      snake_dir = RIGHT;
-      break;
-    case KEY_UP:
-      snake_head->y_pos -= 1;
-      snake_dir = UP;
-      break;
-    case KEY_DOWN:
-      snake_head->y_pos += 1;
-      snake_dir = DOWN;
-      break;
-    default: // if no key was pressed (or no arrow key)
-      continue_moving_in_current_dir(); 
-      break;
-  }
-
-  detect_border_collisions();
-}
-
 void continue_moving_in_current_dir()
 {
   switch (snake_dir) { // just continue moving in the same direction
@@ -79,11 +43,51 @@ void continue_moving_in_current_dir()
   }
 }
 
+void move_snake()
+{
+  // advance all body parts to the position of the next body part
+  snake_part* snake_p;
+  // NOTE: rear parts always point to next part closer to head
+  for (snake_p = snake_rear; snake_p->next != NULL; snake_p = snake_p->next) {
+    snake_p->x_pos = snake_p->next->x_pos;
+    snake_p->y_pos = snake_p->next->y_pos;
+  }
+
+  // using both key presses and releases I avoid the problem that
+  // if a key is pressed and released within one frame
+  // it will not be detected
+  u8 key_code = key_down_code;
+  if (!key_code)
+    key_code = key_up_code;
+
+  // move the snake head according to user input
+  switch (key_code) {
+    case KEY_LEFT://_ARROW:
+      snake_head->x_pos -= 1;
+      snake_dir = LEFT;
+      break;
+    case KEY_RIGHT://_ARROW:
+      snake_head->x_pos += 1;
+      snake_dir = RIGHT;
+      break;
+    case KEY_UP://_ARROW:
+      snake_head->y_pos -= 1;
+      snake_dir = UP;
+      break;
+    case KEY_DOWN://_ARROW:
+      snake_head->y_pos += 1;
+      snake_dir = DOWN;
+      break;
+    default: // if no key was pressed (or no arrow key)
+      continue_moving_in_current_dir(); 
+      break;
+  }
+
+  detect_border_collisions();
+}
+
 void draw_snake()
 {
-  if (!is_game_running)
-    return;
-
   snake_part* snake_p = snake_rear;
   // draw the body parts
   for (; snake_p->next != NULL; snake_p = snake_p->next) {

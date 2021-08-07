@@ -18,10 +18,16 @@
 #define KEY_END 0x93
 #define KEY_PAGE_UP 0x94
 #define KEY_PAGE_DOWN 0x95
+
 #define KEY_LEFT 0x4B
 #define KEY_UP 0x48
 #define KEY_RIGHT 0x4D
 #define KEY_DOWN 0x50
+//#define E0_ADDER 0x40 // TODO: REMOVE THIS WHEN IT IS VERIFIED THAT IT IS UNNECESSARY
+//#define KEY_LEFT_ARROW (KEY_LEFT + E0_ADDER)
+//#define KEY_UP_ARROW (KEY_UP + E0_ADDER)
+//#define KEY_RIGHT_ARROW (KEY_RIGHT + E0_ADDER)
+//#define KEY_DOWN_ARROW (KEY_DOWN + E0_ADDER)
 
 #define KEY_F1 0x80
 #define KEY_F2 (KEY_F1 + 1)
@@ -77,6 +83,7 @@
 // the ASCII code for all alphabetical keys and the defined scancode values
 // from above for all other keys
 extern u8 key_down_code;
+extern u8 key_up_code;
 
 void init_keyboard();
 void keyboard_irq_handler();
