@@ -7,7 +7,6 @@
 #include <candy.h> // for collision detection
 #include <util.h> // for memset
 #include <timer.h> // for wait_seconds
-#include <snake.h> // for redrawing it before game over screen
 
 #define NULL 0
 
