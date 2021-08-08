@@ -3,6 +3,8 @@
 #include <display.h>
 #include <game_ui.h> // definitions of game field border coordinates
 #include <memory.h>
+#include <candy.h> // for collision detection
+#include <util.h> // for memset
 
 typedef enum { NONE, LEFT, RIGHT, UP, DOWN } moving_dir;
 
@@ -14,15 +16,27 @@ int score = 0;
 
 snake_part* snake_head;
 snake_part* snake_rear;
+snake_part prev_rear;
 
 void init_snake()
 {
   snake_head = (snake_part*)kalloc(sizeof(snake_part));
+  memset((char*)snake_head, 0, sizeof(snake_part));
   snake_head->x_pos = SNAKE_INIT_X;
   snake_head->y_pos = SNAKE_INIT_Y;
   snake_head->next = NULL;
   snake_rear = snake_head;
   snake_dir = NONE;
+}
+
+void add_body_part()
+{
+  snake_part* new_part = (snake_part*)kalloc(sizeof(snake_part));
+  memset((char*)new_part, 0, sizeof(snake_part));
+  new_part->x_pos = prev_rear.x_pos;
+  new_part->y_pos = prev_rear.y_pos;
+  new_part->next = snake_rear;
+  snake_rear = new_part;
 }
 
 void continue_moving_in_current_dir()
@@ -48,6 +62,7 @@ void move_snake()
   if (!is_game_running)
     return;
 
+  prev_rear = *snake_rear;
   // advance all body parts to the position of the next body part
   snake_part* snake_p;
   // NOTE: rear parts always point to next part closer to head
@@ -57,29 +72,27 @@ void move_snake()
   }
 
   // move the snake head according to user input
-  switch (key_down_code) {
-    case KEY_LEFT:
-      snake_head->x_pos -= 1;
-      snake_dir = LEFT;
-      break;
-    case KEY_RIGHT:
-      snake_head->x_pos += 1;
-      snake_dir = RIGHT;
-      break;
-    case KEY_UP:
-      snake_head->y_pos -= 1;
-      snake_dir = UP;
-      break;
-    case KEY_DOWN:
-      snake_head->y_pos += 1;
-      snake_dir = DOWN;
-      break;
-    default: // if no key was pressed (or no arrow key)
-      continue_moving_in_current_dir(); 
-      break;
+  // Note that it can not be moved in the opposite direction of the one it is
+  // currently moving in
+  if (key_down_code == KEY_LEFT && snake_dir != RIGHT) {
+    snake_head->x_pos -= 1;
+    snake_dir = LEFT;
+  } else if (key_down_code == KEY_RIGHT && snake_dir != LEFT) {
+    snake_head->x_pos += 1;
+    snake_dir = RIGHT;
+  } else if (key_down_code == KEY_UP && snake_dir != DOWN) {
+    snake_head->y_pos -= 1;
+    snake_dir = UP;
+  } else if (key_down_code == KEY_DOWN && snake_dir != UP) {
+    snake_head->y_pos += 1;
+    snake_dir = DOWN;
+  } else {
+    continue_moving_in_current_dir(); 
   }
 
   detect_border_collisions();
+  detect_candy_collisions();
+  detect_body_collisions();
 }
 
 void draw_snake()
@@ -111,6 +124,28 @@ void detect_border_collisions()
   if (snake_head->x_pos <= FIELD_X_OFFSET || snake_head->x_pos > FIELD_X_OFFSET + FIELD_COLS ||
       snake_head->y_pos <= FIELD_Y_OFFSET || snake_head->y_pos > FIELD_Y_OFFSET + FIELD_ROWS) {
     destroy_snake();
-    init_game_over_screen();
+    game_over_screen();
+  }
+}
+
+void detect_candy_collisions()
+{
+  if (snake_head->x_pos == candy.x_pos && snake_head->y_pos == candy.y_pos) {
+    score++;
+    show_score();
+    spawn_candy();
+    add_body_part();
+  }
+}
+
+void detect_body_collisions()
+{
+  snake_part* snake_p;
+  for (snake_p = snake_rear; snake_p != snake_head; snake_p = snake_p->next) {
+    if (snake_head->x_pos == snake_p->x_pos && snake_head->y_pos == snake_p->y_pos) {
+      destroy_snake();
+      game_over_screen();
+      return;
+    }
   }
 }

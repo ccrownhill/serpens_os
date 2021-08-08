@@ -14,6 +14,8 @@
 // can't go below 19 Hz
 #define FPS 13 // make sure FREQ can be divided evenly by this value
 
+extern u64 ticks;
+
 void init_timer();
 
 #endif

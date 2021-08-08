@@ -10,14 +10,16 @@
 #include <display.h>
 #include <ports_io.h>
 
-void print_char(char c, int col, int row, u8 appearance_byte)
+void print_char(char c, u32 col, u32 row, u8 appearance_byte)
 {
   u16 offset = GET_OFFSET(col, row);
   char* dest_address = (char*)VGA_BUFFER + offset;
   dest_address[0] = c;
   dest_address[1] = appearance_byte;
 
-  set_cursor_offset(offset + 2); // set cursor to next character field
+  // this was commented out because it is not necessary for the game
+  // however setting the cursor is necessary for the "kprint" function
+  //set_cursor_offset(offset + 2); // set cursor to next character field
 }
 
 /**
@@ -30,7 +32,7 @@ void kprint(char* msg)
   kprint_at(msg, GET_COL_FROM_OFFSET(offset), GET_ROW_FROM_OFFSET(offset), WHITE); 
 }
 
-void kprint_at(char* msg, int col, int row, u8 appearance_byte)
+void kprint_at(char* msg, u32 col, u32 row, u8 appearance_byte)
 {
   char* c;
   for (c = msg; *c != '\0'; c++) {
@@ -48,7 +50,7 @@ void kprint_at(char* msg, int col, int row, u8 appearance_byte)
  * it only works if the text fits centered onto the specified location
  * into 1 row
  */
-void kprint_centered(char* msg, int msg_len, int col, int row, u8 appearance_byte)
+void kprint_centered(char* msg, u32 msg_len, u32 col, u32 row, u8 appearance_byte)
 {
   col -= msg_len/2;
   kprint_at(msg, col, row, appearance_byte);

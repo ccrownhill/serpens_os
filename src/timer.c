@@ -10,14 +10,11 @@
 // in main.c
 void game_main_loop();
 
-int counter = 0;
+u64 ticks = 0;
 
 void timer_irq_handler()
 {
-  if (counter++ == FREQ/FPS) {
-    counter = 0;
-    game_main_loop();
-  }
+  ticks++;
 }
 
 /**

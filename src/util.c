@@ -70,9 +70,9 @@ int strlen(char s[])
   return i;
 }
 
-void memset(u8* dest, u8 val, u32 len)
+void memset(char* dest, u8 val, u32 len)
 {
-  u8* temp = dest;
+  char* temp = dest;
   for (; len != 0; len--)
     *temp++ = val;
 }

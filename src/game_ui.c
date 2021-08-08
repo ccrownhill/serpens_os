@@ -3,6 +3,7 @@
 #include <util.h>
 #include <keyboard.h>
 #include <snake.h> // for score extern declaration (if this will be the only thing needed remove this include statement later)
+#include <candy.h> // for spawning it in "starg_game()"
 
 #define BORDER_CHAR 177 // this uses code page 437 encoding
 
@@ -30,12 +31,9 @@ void start_screen()
 
   key_down_code = 0; // ignore all previous key presses
   key_up_code = 0;
-  wait_for_key_release();
-
-  start_game();
 }
 
-void init_game_over_screen()
+void game_over_screen()
 {
   is_game_running = 0;
   clear_screen();
@@ -45,17 +43,6 @@ void init_game_over_screen()
 
   key_down_code = 0; // ignore all previous key presses
   key_up_code = 0; // ignore all previous releases
-}
-
-void start_game()
-{
-  score = 0;
-  key_down_code = 0; // prevent previous arrow key presses to make snake start moving
-  key_up_code = 0;
-  clear_screen();
-  init_snake_ui();
-  init_snake();
-  is_game_running = 1;
 }
 
 static void init_info_text()

@@ -23,10 +23,13 @@ typedef struct snake_part {
 } snake_part;
 
 void init_snake();
+void add_body_part();
 void move_snake();
 void continue_moving_in_currrent_dir();
 void draw_snake();
 void destroy_snake();
 void detect_border_collisions();
+void detect_candy_collisions();
+void detect_body_collisions();
 
 #endif

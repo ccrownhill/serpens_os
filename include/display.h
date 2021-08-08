@@ -39,10 +39,10 @@
 #define LIGHT_BROWN 0xe
 #define WHITE 0xf
 
-void print_char(char c, int col, int row, u8 appearance_byte);
+void print_char(char c, u32 col, u32 row, u8 appearance_byte);
 void kprint(char* msg);
-void kprint_at(char* msg, int col, int row, u8 appearance_byte);
-void kprint_centered(char* msg, int msg_len, int col, int row, u8 appearance_byte);
+void kprint_at(char* msg, u32 col, u32 row, u8 appearance_byte);
+void kprint_centered(char* msg, u32 msg_len, u32 col, u32 row, u8 appearance_byte);
 void clear_screen();
 u16 get_cursor_offset();
 void set_cursor_offset(u16 offset);

@@ -54,7 +54,7 @@ void init_mem_management(int mem_map_len, mem_map_entry_t* mem_map)
   // the first free area after the kernel end in the memory map
   for (i = 0; i < mem_map_len; i++) {
     if (mem_map[i].base_addr > (u32)&_kernelend && mem_map[i].type == MEM_FREE) {
-      memset((u8*)mem_arr, 0, MEM_ARR_MAX_SIZE * sizeof(mem_space_t));
+      memset((char*)mem_arr, 0, MEM_ARR_MAX_SIZE * sizeof(mem_space_t));
       mem_arr[0].base_addr = mem_map[i].base_addr;
 
       // this might be too much memory but since there will nothing else

@@ -4,12 +4,12 @@
 #include <types.h>
 #include <isr.h> // for `struct registers`
 
-// maybe not perfectly correct
 #define KEY_NULL 0
 #define KEY_ESC 27
 #define KEY_BACKSPACE '\b'
 #define KEY_TAB '\t'
 #define KEY_ENTER '\n'
+#define ENTER_SCANCODE 0x1c // this is the code for ENTER press (not release)
 #define KEY_RETURN '\r'
 
 #define KEY_INSERT 0x90
@@ -23,11 +23,6 @@
 #define KEY_UP 0x48
 #define KEY_RIGHT 0x4D
 #define KEY_DOWN 0x50
-//#define E0_ADDER 0x40 // TODO: REMOVE THIS WHEN IT IS VERIFIED THAT IT IS UNNECESSARY
-//#define KEY_LEFT_ARROW (KEY_LEFT + E0_ADDER)
-//#define KEY_UP_ARROW (KEY_UP + E0_ADDER)
-//#define KEY_RIGHT_ARROW (KEY_RIGHT + E0_ADDER)
-//#define KEY_DOWN_ARROW (KEY_DOWN + E0_ADDER)
 
 #define KEY_F1 0x80
 #define KEY_F2 (KEY_F1 + 1)

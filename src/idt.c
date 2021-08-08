@@ -10,7 +10,7 @@ void init_idt()
   idt_desc.limit = sizeof(idt_entry_t) * 256 -1;
   idt_desc.base  = (u32)&idt_entries;
 
-  memset((u8*)&idt_entries, 0, sizeof(idt_entry_t)*256);
+  memset((char*)&idt_entries, 0, sizeof(idt_entry_t)*256);
 
   // set all 48 ISRs by passing the function pointers as 32 bit numbers
   idt_set_gate( 0, (u32)isr0 , KERNEL_CS, PRIVILEGED_INTERRUPT_GATE_TYPE_ATTR);
