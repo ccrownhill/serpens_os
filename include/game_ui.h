@@ -10,8 +10,8 @@
 // text for game over screen
 #define GAME_OVER_SCREEN_TITLE "Game Over"
 #define GAME_OVER_SCREEN_TITLE_LEN 9
-#define GAME_OVER_SCREEN_SUBTITLE "Press ESC to power off or any other key to play again"
-#define GAME_OVER_SCREEN_SUBTITLE_LEN 53
+#define GAME_OVER_SCREEN_SUBTITLE "Press any key to play again"
+#define GAME_OVER_SCREEN_SUBTITLE_LEN 27
 
 // dimensions of the snake playing field
 #define FIELD_COLS 50
