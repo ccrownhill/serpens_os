@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <memory.h>
 #include <display.h> // for print_mem_map
 #include <util.h>
@@ -8,13 +9,13 @@
 enum mem_space_type {EMPTY, ALLOCATED};
 
 typedef struct {
-  u32 base_addr;
-  u32 size;
+  uint32_t base_addr;
+  uint32_t size;
   enum mem_space_type space_type;
 } mem_space_t;
 
 // in link.ld
-extern u32 _kernelend;
+extern uint32_t _kernelend;
 
 mem_space_t* mem_arr;
 int mem_arr_size;
@@ -53,7 +54,7 @@ void init_mem_management(int mem_map_len, mem_map_entry_t* mem_map)
   // the memory area in which allocation will take place should
   // the first free area after the kernel end in the memory map
   for (i = 0; i < mem_map_len; i++) {
-    if (mem_map[i].base_addr > (u32)&_kernelend && mem_map[i].type == MEM_FREE) {
+    if (mem_map[i].base_addr > (uint32_t)&_kernelend && mem_map[i].type == MEM_FREE) {
       memset((char*)mem_arr, 0, MEM_ARR_MAX_SIZE * sizeof(mem_space_t));
       mem_arr[0].base_addr = mem_map[i].base_addr;
 
@@ -96,7 +97,7 @@ void remove_mem_arr_element(int index)
   mem_arr_size--;
 }
 
-void* kalloc(u32 size)
+void* kalloc(uint32_t size)
 {
   void* ret_addr;
   int i;
@@ -109,7 +110,7 @@ void* kalloc(u32 size)
         mem_arr[i].base_addr += size;
         mem_arr[i].size -= size;
         // and insert a new entry of type ALLOCATED before it
-        mem_space_t insert_element = {.base_addr=(u32)ret_addr, .size=size, .space_type=ALLOCATED};
+        mem_space_t insert_element = {.base_addr=(uint32_t)ret_addr, .size=size, .space_type=ALLOCATED};
         insert_mem_arr_element(insert_element, i);
       } else if (mem_arr[i].size == size) {
         // if it is just the same size just convert it to an "ALLOCATED" type entry
@@ -126,7 +127,7 @@ void kfree(void* addr)
   int i;
   for (i = 0; i < mem_arr_size; i++) {
     // find mem_arr entry of addr
-    if (mem_arr[i].base_addr == (u32)addr) {
+    if (mem_arr[i].base_addr == (uint32_t)addr) {
       // set it to be a hole now
       mem_arr[i].space_type = EMPTY;
 

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <irq.h>
 #include <display.h> // for printing
 #include <util.h> // for int_to_ascii
@@ -10,8 +11,8 @@ void pic_setup_with_irq_remap()
   __asm__("sti"); // enable interrupts (sets interrupt flag)
 
   // save masks (for later restoration)
-  u8 mask1 = port_byte_in(PIC1_DATA);
-  u8 mask2 = port_byte_in(PIC2_DATA);
+  uint8_t mask1 = port_byte_in(PIC1_DATA);
+  uint8_t mask2 = port_byte_in(PIC2_DATA);
 
   port_byte_out(PIC1_COMMAND, PIC_INIT_COMMAND); // starts the initialization sequence (in cascade mode)
   io_wait();

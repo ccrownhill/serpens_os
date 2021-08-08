@@ -1,15 +1,16 @@
+#include <stdint.h>
 #include <random.h>
 #include <cmos.h> // to read RTC time
 
-static u32 next = 0;
+static uint32_t next = 0;
 
-u32 rand()
+uint32_t rand()
 {
   next = next * 1103515245 + 12345;
   return (next / 65536) % (RAND_MAX+1);
 }
 
-void srand(u32 seed)
+void srand(uint32_t seed)
 {
   next = seed;
 }
@@ -23,7 +24,7 @@ void srand(u32 seed)
  */
 void rtc_time_rand_seed()
 {
-  u32 seed = 0;
+  uint32_t seed = 0;
   seed += read_cmos_reg(SECONDS_REG);
   seed += read_cmos_reg(MINUTES_REG);
   seed += read_cmos_reg(HOURS_REG);

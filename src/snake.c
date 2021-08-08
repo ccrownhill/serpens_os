@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <snake.h>
 #include <keyboard.h> // for user input
 #include <display.h>
@@ -5,6 +6,10 @@
 #include <memory.h>
 #include <candy.h> // for collision detection
 #include <util.h> // for memset
+#include <timer.h> // for wait_seconds
+#include <snake.h> // for redrawing it before game over screen
+
+#define NULL 0
 
 typedef enum { NONE, LEFT, RIGHT, UP, DOWN } moving_dir;
 
@@ -123,8 +128,7 @@ void detect_border_collisions()
 {
   if (snake_head->x_pos <= FIELD_X_OFFSET || snake_head->x_pos > FIELD_X_OFFSET + FIELD_COLS ||
       snake_head->y_pos <= FIELD_Y_OFFSET || snake_head->y_pos > FIELD_Y_OFFSET + FIELD_ROWS) {
-    destroy_snake();
-    game_over_screen();
+    game_over();
   }
 }
 
@@ -143,9 +147,15 @@ void detect_body_collisions()
   snake_part* snake_p;
   for (snake_p = snake_rear; snake_p != snake_head; snake_p = snake_p->next) {
     if (snake_head->x_pos == snake_p->x_pos && snake_head->y_pos == snake_p->y_pos) {
-      destroy_snake();
-      game_over_screen();
+      game_over();
       return;
     }
   }
+}
+
+void game_over()
+{
+  destroy_snake();
+  wait_seconds(1);
+  game_over_screen();
 }

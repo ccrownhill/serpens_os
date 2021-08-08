@@ -1,7 +1,6 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include <types.h>
 #include <isr.h> // for "struct registers"
 
 #define PIC1    0x20    // IO base address for master PIC

@@ -1,6 +1,6 @@
 /* Kernel of TicTacToe OS */
 
-#include <types.h>
+#include <stdint.h>
 #include <display.h>
 #include <keyboard.h>
 #include <game_ui.h>
@@ -42,16 +42,15 @@ void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
   while(! (key_up_code == ENTER_SCANCODE) ); // wait for ENTER key to be released 
   reset_game_state();
 
-  u64 last_frame = 0;
+  uint32_t last_frame = 0;
   while (1) { // MAIN game loop
-    if ((ticks - last_frame) > (FREQ/FPS)) { // update game with frame rate "FPS"
-      last_frame = ticks;
+    if (((uint32_t)timer_ticks - last_frame) > (TIMER_FREQ/FPS)) { // update game with frame rate "FPS"
+      last_frame = (uint32_t)timer_ticks;
 
       if (is_game_running) {
-        redraw_background();
-
         move_snake();
 
+        redraw_background();
         draw_snake();
         draw_candy();
       } else { // GAME OVER

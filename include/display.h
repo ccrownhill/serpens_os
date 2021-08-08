@@ -1,8 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <types.h>
-
 #define VGA_BUFFER 0xb8000
 
 #define NUM_COLS 80
@@ -39,12 +37,12 @@
 #define LIGHT_BROWN 0xe
 #define WHITE 0xf
 
-void print_char(char c, u32 col, u32 row, u8 appearance_byte);
+void print_char(char c, uint32_t col, uint32_t row, uint8_t appearance_byte);
 void kprint(char* msg);
-void kprint_at(char* msg, u32 col, u32 row, u8 appearance_byte);
-void kprint_centered(char* msg, u32 msg_len, u32 col, u32 row, u8 appearance_byte);
+void kprint_at(char* msg, uint32_t col, uint32_t row, uint8_t appearance_byte);
+void kprint_centered(char* msg, uint32_t msg_len, uint32_t col, uint32_t row, uint8_t appearance_byte);
 void clear_screen();
-u16 get_cursor_offset();
-void set_cursor_offset(u16 offset);
+uint16_t get_cursor_offset();
+void set_cursor_offset(uint16_t offset);
 
 #endif

@@ -1,16 +1,14 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include <types.h>
-
 typedef struct {
-  u64 base_addr;
-  u64 size;
-  u32 type;
+  uint64_t base_addr;
+  uint64_t size;
+  uint32_t type;
 } mem_map_entry_t;
 
 void print_mem_map(int, mem_map_entry_t*);
 void init_mem_management(int, mem_map_entry_t*);
-void* kalloc(u32);
+void* kalloc(uint32_t);
 void kfree(void*);
 #endif

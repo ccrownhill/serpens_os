@@ -1,21 +1,19 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <types.h>
-
 // structure of interrupt gate
 typedef struct idt_entry {
-  u16 isr_low;
-  u16 kernel_cs;
-  u8 reserved; // always 0
-  u8 type_attr;
-  u16 isr_high;
+  uint16_t isr_low;
+  uint16_t kernel_cs;
+  uint8_t reserved; // always 0
+  uint8_t type_attr;
+  uint16_t isr_high;
 } __attribute__((packed)) idt_entry_t; // prevent compiler optimization
 
 // structure of IDT descriptor pointing to an array of interrupt handlers
 typedef struct idt_descriptor {
-  u16 limit; // the size of the array with all 256 interrupt handlers
-  u32 base;
+  uint16_t limit; // the size of the array with all 256 interrupt handlers
+  uint32_t base;
 } __attribute__((packed)) idt_desc_t; // prevent compiler optimization
 
 // Code segment
@@ -80,7 +78,7 @@ extern void isr46();
 extern void isr47();
 
 void init_idt();
-void idt_set_gate(u8, u32, u16, u8);
-void flush_idt(u32);
+void idt_set_gate(uint8_t, uint32_t, uint16_t, uint8_t);
+void flush_idt(uint32_t);
 
 #endif

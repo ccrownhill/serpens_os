@@ -1,8 +1,6 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
-#include <types.h>
-
 #define RAND_MAX 32767
 
 #define SECONDS_REG 0x0
@@ -13,8 +11,8 @@
 #define MONTH_REG 0x8
 #define YEAR_REG 0x9
 
-u32 rand();
-void srand(u32);
+uint32_t rand();
+void srand(uint32_t);
 void rtc_time_rand_seed();
 
 #endif

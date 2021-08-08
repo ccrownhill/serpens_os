@@ -1,11 +1,9 @@
 #ifndef CMOS_H
 #define CMOS_H
 
-#include <types.h>
-
 #define NMI_DISABLE_BIT 0 // don't disable NMIs (Non Maskable Interrupts)
 
-u8 read_cmos_reg(u8);
-void write_cmos_reg(u8, u8);
+uint8_t read_cmos_reg(uint8_t);
+void write_cmos_reg(uint8_t, uint8_t);
 
 #endif

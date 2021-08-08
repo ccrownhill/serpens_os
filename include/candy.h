@@ -7,8 +7,8 @@
 #define CANDY_COLOR RED
 
 typedef struct {
-  u8 x_pos;
-  u8 y_pos;
+  uint8_t x_pos;
+  uint8_t y_pos;
 } candy_t;
 
 extern candy_t candy;

@@ -17,8 +17,8 @@
 extern int score;
 
 typedef struct snake_part {
-  u8 x_pos;
-  u8 y_pos;
+  uint8_t x_pos;
+  uint8_t y_pos;
   struct snake_part* next; // this always points from the part closer to the rear to the one closer to the head
 } snake_part;
 
@@ -31,5 +31,6 @@ void destroy_snake();
 void detect_border_collisions();
 void detect_candy_collisions();
 void detect_body_collisions();
+void game_over();
 
 #endif

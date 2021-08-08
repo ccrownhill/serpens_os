@@ -1,5 +1,6 @@
-#include <idt.h>
+#include <stdint.h>
 #include <isr.h>
+#include <idt.h>
 #include <display.h>
 #include <util.h>
 

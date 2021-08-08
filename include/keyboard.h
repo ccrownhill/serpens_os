@@ -1,7 +1,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <types.h>
 #include <isr.h> // for `struct registers`
 
 #define KEY_NULL 0
@@ -77,15 +76,15 @@
  
 // the ASCII code for all alphabetical keys and the defined scancode values
 // from above for all other keys
-extern u8 key_down_code;
-extern u8 key_up_code;
+extern uint8_t key_down_code;
+extern uint8_t key_up_code;
 
 void init_keyboard();
 void keyboard_irq_handler();
 void wait_for_key_release();
-void send_command(u8 command);
-u8 get_scancode();
-u8 get_key(u8 type_specifying_and_val);
-u8 get_scancode_set();
+void send_command(uint8_t command);
+uint8_t get_scancode();
+uint8_t get_key(uint8_t type_specifying_and_val);
+uint8_t get_scancode_set();
 
 #endif

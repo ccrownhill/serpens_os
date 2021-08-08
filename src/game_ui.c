@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <game_ui.h>
 #include <display.h>
 #include <util.h>
@@ -11,7 +12,7 @@ extern int is_game_running; // in main.c
 
 static void draw_field_borders()
 {
-  int i;
+  uint32_t i;
   for (i = 0; i < FIELD_COLS+2; i++) {
     print_char(BORDER_CHAR, FIELD_X_OFFSET + i, FIELD_Y_OFFSET, LIGHT_BLUE); // upper border
     print_char(BORDER_CHAR, FIELD_X_OFFSET + i, FIELD_Y_OFFSET + FIELD_ROWS+1, LIGHT_BLUE); // lower border
@@ -86,7 +87,10 @@ void init_snake_ui()
  */
 void redraw_background()
 {
-  int col, row;
+  if (!is_game_running)
+    return;
+
+  uint32_t col, row;
   for (col = FIELD_X_OFFSET+1; col < FIELD_X_OFFSET + FIELD_COLS + 1; col++)
     for (row = FIELD_Y_OFFSET+1; row < FIELD_Y_OFFSET + FIELD_ROWS + 1; row++)
       print_char('\0', col, row, BLACK);

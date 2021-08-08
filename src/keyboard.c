@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <keyboard.h>
 #include <ports_io.h>
 #include <irq.h>
@@ -8,7 +9,7 @@
  * Use the scancode as the index to get the right character
  * Note: Non-ASCII characters like the F. keys get values greater than 0x7f
  */
-u8 scancode_set1_chars[128] = {
+uint8_t scancode_set1_chars[128] = {
   KEY_NULL, KEY_ESC, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
   '-', '=', KEY_BACKSPACE, KEY_TAB, 'q', 'w', 'e', 'r', 't', 'y', 'u',
   'i', 'o', 'p', '[', ']', KEY_ENTER, 0, 'a', 's', 'd', 'f', 'g', 'h', 'j',
@@ -19,8 +20,8 @@ u8 scancode_set1_chars[128] = {
   KEY_PAGE_DOWN, KEY_INSERT, KEY_DELETE, 0, 0, 0, KEY_F11, KEY_F12
 };
 
-u8 key_down_code = 0;
-u8 key_up_code = 0;
+uint8_t key_down_code = 0;
+uint8_t key_up_code = 0;
 
 void init_keyboard()
 {
@@ -46,7 +47,7 @@ void init_keyboard()
  */
 void keyboard_irq_handler()
 {
-  u8 scancode = port_byte_in(0x60);
+  uint8_t scancode = port_byte_in(0x60);
 
   // NOTE: Be careful with the IS_KEY_UP check because
   // it will also qualify the 0xe0 prefix for example (sent before arrow keys for example)
@@ -66,7 +67,7 @@ void wait_for_key_release()
   while (! (key_up_code == key_down_code) ); // wait for the corresponding release
 }
 
-void send_command(u8 command)
+void send_command(uint8_t command)
 {
   // wait until command input buffer is empty
   // by checking if the second bit of the status register is set
@@ -77,7 +78,7 @@ void send_command(u8 command)
 /**
  * Get scancode as soon as one is in the keyboard output buffer
  */
-u8 get_scancode()
+uint8_t get_scancode()
 {
   // wait until output buffer is full
   while (!(port_byte_in(0x64) & 0x1)) {}
@@ -89,9 +90,9 @@ u8 get_scancode()
  * If translation from set 2 to 1 is enable in the KBC
  * the sets 1, 2 and 3 will be returned as 0x43, 0x41 and 0x3f
  */
-u8 get_scancode_set()
+uint8_t get_scancode_set()
 {
-  u8 result;
+  uint8_t result;
   send_command(0xf0);
 
   while (!(port_byte_in(0x60) & 0xfa)) {} // wait for ACK response

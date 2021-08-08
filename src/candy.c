@@ -1,6 +1,7 @@
+#include <stdint.h>
+#include <candy.h>
 #include <game_ui.h> // for field dimensions and other info
 #include <random.h> // for spawning at random location
-#include <candy.h>
 
 // in main.c
 extern int is_game_running;
@@ -10,8 +11,8 @@ candy_t candy;
 void spawn_candy()
 {
   // put candy at random new position
-  candy.x_pos = FIELD_X_OFFSET + (u8)(rand() % FIELD_COLS) + 1;
-  candy.y_pos = FIELD_Y_OFFSET + (u8)(rand() % FIELD_ROWS) + 1;
+  candy.x_pos = FIELD_X_OFFSET + (uint8_t)(rand() % FIELD_COLS) + 1;
+  candy.y_pos = FIELD_Y_OFFSET + (uint8_t)(rand() % FIELD_ROWS) + 1;
 }
 
 void draw_candy()

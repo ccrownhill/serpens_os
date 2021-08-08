@@ -1,5 +1,5 @@
+#include <stdint.h>
 #include <util.h>
-#include <types.h>
 #include <display.h> // for "fatal"
 
 /**
@@ -32,11 +32,11 @@ void int_to_ascii(int n, char s[])
 }
 
 /**
- * u64 number so that all addresses will fit into it
+ * uint64_t number so that all addresses will fit into it
  */
-void int_to_hexascii(u64 n, char s[])
+void int_to_hexascii(uint64_t n, char s[])
 {
-  u64 last_digit;
+  uint64_t last_digit;
   //n = -n; // for testing
   int i = 0;
   do {      // generate digits in reverse order
@@ -70,7 +70,7 @@ int strlen(char s[])
   return i;
 }
 
-void memset(char* dest, u8 val, u32 len)
+void memset(char* dest, uint8_t val, uint32_t len)
 {
   char* temp = dest;
   for (; len != 0; len--)
