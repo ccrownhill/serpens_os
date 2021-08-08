@@ -47,18 +47,6 @@ void init_keyboard()
 void keyboard_irq_handler()
 {
   u8 scancode = port_byte_in(0x60);
-  u8 scancode_adder = 0; // if the keyboard sends a multiple byte scancode
-#include <util.h> // for testing only
-  char test[5];
-  int_to_hexascii((u64)scancode, test);
-  kprint_at(test, 0, 24, RED);
-
-  // this 0xe0 checking stuff is only needed for getting correct arrow key input
-  //if (scancode == 0xe0) { // the 0xe0 byte comes for example before arrow keys
-  //  while (!(port_byte_in(0x64) & 0x1)); // wait for full output buffer
-  //  scancode = port_byte_in(0x60);
-  //  scancode_adder = E0_ADDER;
-  //}
 
   // NOTE: Be careful with the IS_KEY_UP check because
   // it will also qualify the 0xe0 prefix for example (sent before arrow keys for example)
@@ -66,22 +54,16 @@ void keyboard_irq_handler()
   // To really check for a key release first wait for a key press as done in
   // the "wait_for_key_release()" function
   if (IS_KEY_UP(scancode)) {
-    kprint("up");
-    key_down_code = 0;
     key_up_code = scancode & 0x7f; // only use lower 7 bits
   } else {
-    kprint("down");
-    key_down_code = scancode + scancode_adder;
+    key_down_code = scancode;
   }
 }
 
 void wait_for_key_release()
 {
-  kprint("start");
-  while(!key_down_code); // wait until a key was pressed
-  kprint("down");
-  while(key_down_code); // wait until key was released
-  kprint("up");
+  while (!key_down_code); // wait for key press
+  while (! (key_up_code == key_down_code) ); // wait for the corresponding release
 }
 
 void send_command(u8 command)

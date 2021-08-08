@@ -24,7 +24,7 @@
 #define SCORE_ROW 9
 
 void start_screen();
-void game_over_screen();
+void init_game_over_screen();
 void start_game();
 void init_snake_ui();
 void show_score();

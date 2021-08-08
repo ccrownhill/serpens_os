@@ -45,6 +45,9 @@ void continue_moving_in_current_dir()
 
 void move_snake()
 {
+  if (!is_game_running)
+    return;
+
   // advance all body parts to the position of the next body part
   snake_part* snake_p;
   // NOTE: rear parts always point to next part closer to head
@@ -53,28 +56,21 @@ void move_snake()
     snake_p->y_pos = snake_p->next->y_pos;
   }
 
-  // using both key presses and releases I avoid the problem that
-  // if a key is pressed and released within one frame
-  // it will not be detected
-  u8 key_code = key_down_code;
-  if (!key_code)
-    key_code = key_up_code;
-
   // move the snake head according to user input
-  switch (key_code) {
-    case KEY_LEFT://_ARROW:
+  switch (key_down_code) {
+    case KEY_LEFT:
       snake_head->x_pos -= 1;
       snake_dir = LEFT;
       break;
-    case KEY_RIGHT://_ARROW:
+    case KEY_RIGHT:
       snake_head->x_pos += 1;
       snake_dir = RIGHT;
       break;
-    case KEY_UP://_ARROW:
+    case KEY_UP:
       snake_head->y_pos -= 1;
       snake_dir = UP;
       break;
-    case KEY_DOWN://_ARROW:
+    case KEY_DOWN:
       snake_head->y_pos += 1;
       snake_dir = DOWN;
       break;
@@ -88,6 +84,9 @@ void move_snake()
 
 void draw_snake()
 {
+  if (!is_game_running)
+    return;
+
   snake_part* snake_p = snake_rear;
   // draw the body parts
   for (; snake_p->next != NULL; snake_p = snake_p->next) {
@@ -112,6 +111,6 @@ void detect_border_collisions()
   if (snake_head->x_pos <= FIELD_X_OFFSET || snake_head->x_pos > FIELD_X_OFFSET + FIELD_COLS ||
       snake_head->y_pos <= FIELD_Y_OFFSET || snake_head->y_pos > FIELD_Y_OFFSET + FIELD_ROWS) {
     destroy_snake();
-    game_over_screen();
+    init_game_over_screen();
   }
 }

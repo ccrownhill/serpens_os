@@ -29,16 +29,13 @@ void start_screen()
   kprint_centered(START_SCREEN_SUBTITLE, START_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
   key_down_code = 0; // ignore all previous key presses
+  key_up_code = 0;
   wait_for_key_release();
-  //key_up_code = 0; // ignore all previous key releases
-  //while (!key_up_code);
-  key_up_code = 0; // clear code of key release just detected
 
   start_game();
 }
 
-// TODO: Make the computer poweroff if ESC was pressed
-void game_over_screen()
+void init_game_over_screen()
 {
   is_game_running = 0;
   clear_screen();
@@ -46,28 +43,15 @@ void game_over_screen()
   kprint_centered(GAME_OVER_SCREEN_TITLE, GAME_OVER_SCREEN_TITLE_LEN, 38, 11, WHITE);
   kprint_centered(GAME_OVER_SCREEN_SUBTITLE, GAME_OVER_SCREEN_SUBTITLE_LEN, 38, 15, WHITE);
 
-  // get scancodes and print them for testing
-  //char test[5];
-  //u8 test_code = get_scancode();
-  //int_to_hexascii(test_code, test);
-  //kprint_at(test, 0, 20, GREEN);
-  //test_code = get_scancode();
-  //int_to_hexascii(test_code, test);
-  //kprint_at(test, 6, 20, GREEN);
-
   key_down_code = 0; // ignore all previous key presses
-  wait_for_key_release();
-  //key_up_code = 0; // ignore all previous key releases
-  //while (!key_up_code);
-  key_up_code = 0; // clear code of key release just detected
-  
-  start_game();
+  key_up_code = 0; // ignore all previous releases
 }
 
 void start_game()
 {
   score = 0;
   key_down_code = 0; // prevent previous arrow key presses to make snake start moving
+  key_up_code = 0;
   clear_screen();
   init_snake_ui();
   init_snake();
