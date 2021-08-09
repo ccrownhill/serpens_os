@@ -2,6 +2,8 @@
 
 This is an Operating System that boots up and starts a game of Snake.
 
+Note that this has only been tested in QEMU and not on real hardware.
+
 ## Compilation
 
 To be able to compile this OS and run it using the Makefile included here you need to create an `i686-elf` cross compiler.
