@@ -10,8 +10,6 @@
 
 #define NULL 0
 
-typedef enum { NONE, LEFT, RIGHT, UP, DOWN } moving_dir;
-
 extern int is_game_running; // in main.c
 
 moving_dir snake_dir;
@@ -22,6 +20,10 @@ snake_part* snake_head;
 snake_part* snake_rear;
 snake_part prev_rear;
 
+int inpt_queue_len = 0;
+inpt_queue_item* inpt_queue_first;
+inpt_queue_item* inpt_queue_last;
+
 void init_snake()
 {
   snake_head = (snake_part*)kalloc(sizeof(snake_part));
@@ -31,6 +33,9 @@ void init_snake()
   snake_head->next = NULL;
   snake_rear = snake_head;
   snake_dir = NONE;
+
+  inpt_queue_first = NULL;
+  inpt_queue_last = NULL;
 }
 
 void add_body_part()
@@ -77,21 +82,27 @@ void move_snake()
 
   // move the snake head according to user input
   // Note that it can not be moved in the opposite direction of the one it is
-  // currently moving in
-  if (key_down_code == KEY_LEFT && snake_dir != RIGHT) {
-    snake_head->x_pos -= 1;
-    snake_dir = LEFT;
-  } else if (key_down_code == KEY_RIGHT && snake_dir != LEFT) {
-    snake_head->x_pos += 1;
-    snake_dir = RIGHT;
-  } else if (key_down_code == KEY_UP && snake_dir != DOWN) {
-    snake_head->y_pos -= 1;
-    snake_dir = UP;
-  } else if (key_down_code == KEY_DOWN && snake_dir != UP) {
-    snake_head->y_pos += 1;
-    snake_dir = DOWN;
-  } else {
-    continue_moving_in_current_dir(); 
+  // currently moving in (this is checked when before enqueuing the directions)
+  moving_dir dir_inpt = dequeue_input();
+  switch (dir_inpt) {
+    case LEFT:
+      snake_head->x_pos -= 1;
+      snake_dir = LEFT;
+      break;
+    case RIGHT:
+      snake_head->x_pos += 1;
+      snake_dir = RIGHT;
+      break;
+    case UP:
+      snake_head->y_pos -= 1;
+      snake_dir = UP;
+      break;
+    case DOWN:
+      snake_head->y_pos += 1;
+      snake_dir = DOWN;
+      break;
+    default:
+      continue_moving_in_current_dir();
   }
 
   detect_border_collisions();
@@ -115,12 +126,12 @@ void draw_snake()
 
 void destroy_snake()
 {
-  snake_part* snake_p;
-  snake_part* next;
+  snake_part *snake_p, *next;
   for (snake_p = snake_rear; snake_p != NULL; snake_p = next) {
     next = snake_p->next;
     kfree(snake_p);
   }
+  destroy_input_queue();
 }
 
 void detect_border_collisions()
@@ -157,4 +168,83 @@ void game_over()
   destroy_snake();
   wait_seconds(1);
   game_over_screen();
+}
+
+void process_input()
+{
+  // if any arrow key was pressed add the implied moving direction to the
+  // snake movement input queue
+  switch (key_down_code) {
+    case KEY_LEFT:
+      enqueue_input(LEFT);
+      break;
+    case KEY_RIGHT:
+      enqueue_input(RIGHT);
+      break;
+    case KEY_UP:
+      enqueue_input(UP);
+      break;
+    case KEY_DOWN:
+      enqueue_input(DOWN);
+      break;
+  }
+}
+
+void enqueue_input(moving_dir dir)
+{
+  // ignore the direction if it is opposite or equal to the one before
+  // the one before is the snake_dir if the queue is empty or
+  // the next queue item
+  if ((inpt_queue_len && (dir == inpt_queue_last->dir || are_dirs_opposite(dir, inpt_queue_last->dir))) ||
+      (!inpt_queue_len && (dir == snake_dir || are_dirs_opposite(dir, snake_dir))))
+    return;
+
+  if (inpt_queue_len == MAX_INPT_QUEUE_LEN)
+    dequeue_input();
+
+  inpt_queue_item* new_item = (inpt_queue_item*)kalloc(sizeof(inpt_queue_item));
+  memset((char*)new_item, 0, sizeof(inpt_queue_item));
+  new_item->dir = dir;
+  new_item->next = inpt_queue_last;
+  new_item->prev = NULL;
+  if (inpt_queue_last)
+    inpt_queue_last->prev = new_item;
+  inpt_queue_last = new_item;
+  if (!inpt_queue_first) // check if this is the first item inserted
+    inpt_queue_first = inpt_queue_last;
+  inpt_queue_len++;
+}
+
+moving_dir dequeue_input()
+{
+  if (inpt_queue_first) {
+    moving_dir ret_dir = inpt_queue_first->dir;
+    inpt_queue_item* tmp = inpt_queue_first;
+    inpt_queue_first = inpt_queue_first->prev;
+    kfree(tmp);
+    if (!inpt_queue_first) // if queue has become empty
+      inpt_queue_last = NULL;
+    else
+      inpt_queue_first->next = NULL;
+    inpt_queue_len--;
+    return ret_dir;
+  } else {
+    return NONE;
+  }
+}
+
+void destroy_input_queue()
+{
+  inpt_queue_item *item, *next;
+  for (item = inpt_queue_last; item != NULL; item = next) {
+    next = item->next;
+    kfree(item);
+  }
+  inpt_queue_len = 0;
+}
+
+int are_dirs_opposite(moving_dir d1, moving_dir d2)
+{
+  return ( (d1 == LEFT && d2 == RIGHT) || (d1 == RIGHT && d2 == LEFT) ||
+           (d1 == UP && d2 == DOWN) || (d1 == DOWN && d2 == UP) );
 }

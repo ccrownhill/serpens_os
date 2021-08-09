@@ -35,11 +35,11 @@ void init_timer()
 {
   install_irq_handler(TIMER_IRQ, timer_irq_handler);
   port_byte_out(PIT_MODE_REGISTER, PIT_SQUARE_WAVE_MODE);
-  set_timer_frequency(TIMER_FREQ);
+  set_timer_frequency(FPS);
 }
 
 void wait_seconds(uint32_t seconds)
 {
   uint32_t first_tick = (uint32_t)timer_ticks; // this is a 32 bit OS so cast it to 32 bit
-  while( ((uint32_t)timer_ticks-first_tick) / TIMER_FREQ < seconds);
+  while( ((uint32_t)timer_ticks-first_tick) / FPS < seconds);
 }

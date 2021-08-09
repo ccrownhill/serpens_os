@@ -4,7 +4,7 @@
 #include <util.h>
 
 #define MEM_FREE 1
-#define MEM_ARR_MAX_SIZE 3000 // entries not bytes
+#define MEM_ARR_MAX_SIZE 4000 // entries not bytes
 
 enum mem_space_type {EMPTY, ALLOCATED};
 

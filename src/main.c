@@ -42,17 +42,27 @@ void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
   while(! (key_up_code == ENTER_SCANCODE) ); // wait for ENTER key to be released 
   reset_game_state();
 
-  uint32_t last_frame = 0;
+  uint32_t last_frame = 0, last_moving_tick = 0;
   while (1) { // MAIN game loop
-    if (((uint32_t)timer_ticks - last_frame) > (TIMER_FREQ/FPS)) { // update game with frame rate "FPS"
+
+    if ((uint32_t)timer_ticks != last_frame) { // this is done every frame at frame rate "FPS"
       last_frame = (uint32_t)timer_ticks;
 
       if (is_game_running) {
-        move_snake();
+        // input is processed every frame and not only at the snake moving rate
+        // that way no key presses will be ignored
+        process_input();
 
-        redraw_background();
-        draw_snake();
-        draw_candy();
+        if (((uint32_t)timer_ticks - last_moving_tick) > (FPS/SNAKE_SPEED)) { // move snake
+          last_moving_tick = (uint32_t)timer_ticks;
+
+          move_snake();
+
+          redraw_background();
+          draw_snake();
+          draw_candy();
+          
+        }
       } else { // GAME OVER
         // in the game over screen wait for ENTER key release to restart the game
         if (key_up_code == ENTER_SCANCODE)
