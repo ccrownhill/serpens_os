@@ -5,6 +5,8 @@
 
 #define MEM_FREE 1
 #define MEM_ARR_MAX_SIZE 4000 // entries not bytes
+#define DEFAULT_FREE_MEM_BASE_ADDR 0x100000
+#define DEFAULT_FREE_MEM_SIZE 0x100000
 
 enum mem_space_type {EMPTY, ALLOCATED};
 
@@ -50,23 +52,28 @@ void init_mem_management(int mem_map_len, mem_map_entry_t* mem_map)
 
   // memory management array is put right after the kernel end
   mem_arr = (mem_space_t*)&_kernelend;
+  memset((char*)mem_arr, 0, MEM_ARR_MAX_SIZE * sizeof(mem_space_t));
 
+  // use default values before trying to actually use memory map information
+  mem_arr[0].base_addr = DEFAULT_FREE_MEM_BASE_ADDR;
+  mem_arr[0].size = DEFAULT_FREE_MEM_SIZE;
+  mem_arr[0].space_type = EMPTY;
+  mem_arr_size = 1;
+
+  // no try to find good spot in real memory map obtained in bootloader
   // the memory area in which allocation will take place should
   // the first free area after the kernel end in the memory map
   for (i = 0; i < mem_map_len; i++) {
-    if (mem_map[i].base_addr > (uint32_t)&_kernelend && mem_map[i].type == MEM_FREE) {
-      memset((char*)mem_arr, 0, MEM_ARR_MAX_SIZE * sizeof(mem_space_t));
-      mem_arr[0].base_addr = mem_map[i].base_addr;
+    if ((uint32_t)mem_map[i].base_addr > (uint32_t)&_kernelend && mem_map[i].type == MEM_FREE) {
+      mem_arr[0].base_addr = (uint32_t)mem_map[i].base_addr;
 
       // this might be too much memory but since there will nothing else
       // but my little snake game to allocate memory it should not matter
-      mem_arr[0].size = mem_map[i].size;
+      mem_arr[0].size = (uint32_t)mem_map[i].size;
       mem_arr[0].space_type = EMPTY;
-      mem_arr_size = 1;
-      return; // only 1 free area needs to be found
+      break;
     }
   }
-  fatal("No free memory area found");
 }
 
 void insert_mem_arr_element(mem_space_t element, int index)

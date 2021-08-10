@@ -8,8 +8,6 @@ void (*irq_handlers[16])() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void pic_setup_with_irq_remap()
 {
-  __asm__("sti"); // enable interrupts (sets interrupt flag)
-
   // save masks (for later restoration)
   uint8_t mask1 = port_byte_in(PIC1_DATA);
   uint8_t mask2 = port_byte_in(PIC2_DATA);
@@ -36,6 +34,8 @@ void pic_setup_with_irq_remap()
   // hopefully all interrupts are 0 (enabled) and not 1 (disabled)
   port_byte_out(PIC1_DATA, mask1);
   port_byte_out(PIC2_DATA, mask2);
+
+  __asm__("sti"); // enable interrupts (sets interrupt flag)
 }
 
 void irq_handler(struct registers* regs)

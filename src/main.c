@@ -39,7 +39,7 @@ void main(int mem_map_entry_count, mem_map_entry_t* mem_map)
   rtc_time_rand_seed();
 
   start_screen();
-  while(! (key_up_code == ENTER_SCANCODE) ); // wait for ENTER key to be released 
+  while(! (key_up_code == ENTER_SCANCODE) ); // wait for ENTER key to be released
   reset_game_state();
 
   uint32_t last_frame = 0, last_moving_tick = 0;
