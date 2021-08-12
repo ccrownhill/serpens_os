@@ -4,6 +4,8 @@ This is an Operating System that boots up and starts a game of Snake.
 
 (One could also say that it is not really an operating system (if OS is defined as an environment to run other programs in)  but rather a Snake game that runs **without** an operating system on bare metal.)
 
+![game_play_pic](pictures/snake_os_gameplay.png)
+
 ## Compilation
 
 To be able to compile this OS and run it using the Makefile included here you need to create an `i686-elf` cross compiler.
