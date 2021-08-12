@@ -42,6 +42,9 @@ boot-floppy: boot.img
 boot-cdrom: boot.iso
 	qemu-system-i386 -cdrom $<
 
+qemu-debug: boot.img
+	qemu-system-i386 -s -S -drive format=raw,file=$< -d cpu_reset
+
 clean:
 	rm -f *.o *.bin *.img *.iso
 	rm -f src/*.o src/*.bin

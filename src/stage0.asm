@@ -4,8 +4,6 @@
 entry:
   ; disable interrupts
   cli
-  ; clear direction flag
-  cld
 
   xor ax, ax
   mov es, ax
@@ -23,6 +21,9 @@ entry:
   int 0x10
 
 ; get a memory map using int 0x15 with EAX=0xe820
+; if this interrupt is not supported or any other error happens while
+; getting the memory map it will just be ignored and the kernel will use
+; some default memory address for where allocations can take place
 mem_map_acquisition:
   xor bp, bp ; use bp as counter of memory map entries that were read
   xor ebx, ebx ; ebx 0 to start at beginning of map
@@ -34,11 +35,11 @@ read_next_mem_map_entry:
   mov ecx, mem_map_entry_size
   int 0x15
 
-  inc bp ; increment entry counter
   jc mem_map_acquisition_err ; carry flag is set on error
   mov edx, smap_magic_num ; sometimes it does not persist in edx
   cmp eax, edx ; on success eax should be set to SMAP
   jne mem_map_acquisition_err
+  inc bp ; increment entry counter
   cmp ebx, 0 ; this means that all entries were read
   je mem_map_acquisition_done
 
@@ -46,37 +47,12 @@ read_next_mem_map_entry:
   jmp read_next_mem_map_entry ; read next entry
 
 mem_map_acquisition_err:
-  mov si, MEM_INFO_ERR_MSG
-  call print
-  jmp $ ; hang forever
+  mov bp, 0x0 ; just make sure that the kernel can't read any entries if there was an error
 
 mem_map_acquisition_done:
   mov [mem_map_entry_count], bp ; store entry count in memory to pass it to kernel later
 
-chs_disk_info:
-  ; get info about disk parameters like maximum number of tracks, heads, cylinders
-  ; this will be necessary only for CHS read because with this data I can
-  ; determine if the next sector is on the next head or cylinder and
-  ; switch to the next head/cylinder
-  mov ah, 0x8
-  mov dl, [drive_num]
-  int 0x13
-  mov byte [sectors_per_track], cl
-  and byte [sectors_per_track], 0x3f ; only look at bits 5-0
-  mov byte [max_head_num], dh
-  mov byte [max_cylinder_num], cl
-  and word [max_cylinder_num], 0xc0 ; only look at bits 7-6
-  shl word [max_cylinder_num], 2 ; these 2 bits are the bits 9-8 of the cylinder num
-  or byte [max_cylinder_num], ch
-
-; check if extended LBA read is supported by BIOS
-extension_check:
-  mov ah, 0x41
-  mov bx, 0x55aa
-  mov dl, [drive_num]
-  int 0x13
-  jc chs_disk_read ; carry flag set if extensions not supported (fall back to chs)
-
+; Try Extended LBA read first and fall back to CHS if this does not succeed
 lba_disk_read:
   mov di, max_disk_read_tries ; for every sector use these max tries to read it
 
@@ -99,8 +75,26 @@ lba_next_sector:
   jmp lba_disk_read ; now read that next sector
 
 lba_try_again:
+  dec di
   jnz lba_read_sector
-  jmp disk_error
+  ;jmp disk_error
+
+
+chs_disk_info:
+  ; get info about disk parameters like maximum number of tracks, heads, cylinders
+  ; this will be necessary only for CHS read because with this data I can
+  ; determine if the next sector is on the next head or cylinder and
+  ; switch to the next head/cylinder
+  mov ah, 0x8
+  mov dl, [drive_num]
+  int 0x13
+  mov byte [sectors_per_track], cl
+  and byte [sectors_per_track], 0x3f ; only look at bits 5-0
+  mov byte [max_head_num], dh
+  mov byte [max_cylinder_num], cl
+  and word [max_cylinder_num], 0xc0 ; only look at bits 7-6
+  shl word [max_cylinder_num], 2 ; these 2 bits are the bits 9-8 of the cylinder num
+  or byte [max_cylinder_num], ch
 
 chs_disk_read:
   mov di, max_disk_read_tries ; for every sector use these max tries to read it
@@ -148,8 +142,6 @@ chs_next_cylinder:
   jmp chs_disk_read
 
 chs_try_again:
-  mov ah, 0x0
-  int 0x13
   dec di
   jnz chs_read_sector
   jmp disk_error
@@ -159,10 +151,6 @@ switch_to_pm:
   in al, 0x92
   or al, 2
   out 0x92, al
-
-  ; clear DS register
-  xor ax, ax
-  mov ds, ax
 
   ; load GDT descriptor table
   lgdt [gdt_desc]
@@ -188,8 +176,6 @@ pm_entry:
   mov gs, ax
   mov ss, ax
 
-  mov esp, 0x3000
-
   ; note that the start of the memory map is just 4 bytes after mem_map_entry_count
   ; before calling the kernel main function in the bootstrap assembly of the kernel
   ; this should be pushed so that the kernel main function can read it as its
@@ -211,7 +197,7 @@ print:
     
     ; check if '\0' character at the end is reached
     cmp byte [si], 0x0
-    jnz print_next_char
+    jne print_next_char
   ret
 
 ; for debugging (uncomment it to use it and also uncomment the line with "hexdigits")
@@ -254,10 +240,11 @@ disk_error:
   call print
   jmp $
 
-; UNCOMMENT this for using the print_hex function
+; UNCOMMENT this for using the print_hex function:
 ;hexdigits: db "0123456789ABCDEF" ; used for printing hex values
-DISK_ERR_MSG: db "DISK ERROR", 0xd, 0xa, 0x0
-MEM_INFO_ERR_MSG: db "Can't get memory info", 0xd, 0xa, 0x0
+
+DISK_ERR_MSG: db "DISK ERR", 0xd, 0xa, 0x0
+;MEM_INFO_ERR_MSG: db "MEMINFO ERR", 0xd, 0xa, 0x0
 
 ; store entry count at this address after the bootsector and before the kernel
 smap_magic_num equ 0x0534D4150
@@ -285,7 +272,7 @@ sector_size equ 512 ; in bytes
 sectors_read: db 0
 
 align 8
-; used for Extended Read from disk
+; used for Extended LBA Read from disk
 disk_address_packet:
   db 0x10 ; size of DAP
   db 0x0 ; unused
@@ -330,6 +317,26 @@ gdt_desc:
   dw gdt_end - gdt_start - 1 ; GDT size - 1
   dd gdt_start ; gdt base
 
+; MBR partition table starting at byte 446
+times 446-($-$$) db 0
+
+; partition 1 (contains the kernel code)
+boot_indicator: db 0x80 ; mark as bootable
+starting_head: db 0x0
+starting_sector: db 0x1 ; bits 5-0 for sector and bits 7-6 are upper bits of cylinder
+starting_cylinder: db 0x0
+system_id: db 0x7f ; just some ID that has not been used for anything else by standard
+; the last sector of the partition should be 2880
+ending_head: db 45 ; here I assume the maximum number of heads as 255
+ending_sector: db 45
+ending_cylinder: db 0x0
+first_sector_lba: dd 0x1 ; first sector after the bootsector
+total_sectors_in_partition: dd 2879 ; 2880-1 because first sector is bootsector
+
+; partitions 2-4 are unused and therefore set to 0
+times 16 db 0
+times 16 db 0
+times 16 db 0
+
 ; MBR boot signature
-times 510-($-$$) db 0
 dw 0xaa55
