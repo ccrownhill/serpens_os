@@ -49,4 +49,4 @@ clean:
 	rm -f *.o *.bin *.img *.iso
 	rm -f src/*.o src/*.bin
 
-.PHONY: all boot boot-floppy boot-cdrom clean
+.PHONY: all boot boot-floppy boot-cdrom qemu-debug clean
