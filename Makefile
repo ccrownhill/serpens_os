@@ -21,9 +21,9 @@ all: boot.img
 kernel.bin: src/start.o src/isrs.o $(OBJ)
 	$(LD) -o $@ -Tlink.ld $^ --oformat binary
 
-boot.img: src/stage0.bin kernel.bin
+boot.img: src/bootloader.bin kernel.bin
 	dd if=/dev/zero of=boot.img bs=512 count=2880
-	dd if=src/stage0.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
+	dd if=src/bootloader.bin of=boot.img conv=notrunc bs=512 seek=0 count=1
 	dd if=kernel.bin of=boot.img conv=notrunc bs=512 seek=1 count=2048
 
 boot.iso: boot.img
